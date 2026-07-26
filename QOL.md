@@ -94,6 +94,7 @@ Nothing here is enabled. These are the real choices left.
 | `I_EXP_SHARE_ITEM` | `GEN_5` | ⚠️ Currently the **held item**. `GEN_6` makes it the party-wide toggle key item |
 | `OW_FOLLOWERS_ENABLED` | `FALSE` | HGSS follower Pokémon. Needs extra scripting to be fully supported |
 | `SKIP_SAVE_CONFIRMATION` | `FALSE` | Drops the "there is already a saved file" prompt |
+| ✅ `P_CAN_FORGET_HIDDEN_MOVE` | now `TRUE` | HMs are forgettable — no HM slave, no Move Deleter trip |
 | `AUTO_SCROLL_TEXT` | `FALSE` | Text advances itself after a delay |
 | `TEXT_SPEED_INSTANT` | `FALSE` | Truly instant text, overriding the options menu |
 
@@ -127,6 +128,14 @@ while the configs are off. Enabling them shifts no offsets.
 **Enabled here:** `OW_BERRY_IMMORTAL` and `OW_BERRY_MUTATIONS` — the two that add
 value without adding upkeep. Both verified independent of `OW_BERRY_MOISTURE`,
 which stays off, so there is no watering schedule, no weeds and no pests.
+
+**Where berries come from:** the Pretty Petal Flower Shop on Route 104, just past
+Petalburg Woods, sells them from the player's first visit. Its twelve items cover
+all five **first-tier** mutation pairs in `sBerryMutations` (`berry.c:2949`) —
+CHESTO+PERSIM, ORAN+PECHA, ASPEAR+LEPPA, AGUAV+FIGY, IAPAPA+MAGO — plus CHERI and
+RAWST. The table has 14 rows; later tiers need the type-resist berries (YACHE,
+TANGA, ROSELI, KASIB, WACAN) as second parents, and those are deliberately not
+sold, so the stat berries at the end of the chain still have to be earned.
 
 | Setting | What it adds |
 |---|---|
@@ -186,7 +195,7 @@ headers when checking.
 | `OW_FLAG_NO_TRAINER_SEE` | Trainers stop initiating battles |
 | `B_FLAG_NO_WHITEOUT` | Player can't lose to trainers (party is *not* auto-healed) |
 | `B_FLAG_SLEEP_CLAUSE` | Sleep clause |
-| `I_VS_SEEKER_CHARGING` | The VS Seeker (disables Match Call rematches) |
+| `I_VS_SEEKER_CHARGING` | ❌ **Decided against** — see below |
 | `I_ORAS_DOWSING_FLAG` | ORAS Dowsing Machine with proximity colours/sounds |
 | `P_FLAG_EGG_MOVES` / `P_FLAG_TUTOR_MOVES` | Individual relearners without enabling all |
 | `FLAG_TEXT_SPEED_INSTANT` | Toggleable instant text |
@@ -335,6 +344,29 @@ roughly 195 species caught — very early for this hack.
 
 If it is ever re-enabled, set `B_CRITICAL_CAPTURE_LOCAL_DEX FALSE` at the same
 time to restore the intended curve.
+
+### Rematches: why Match Call beat the Vs. Seeker
+
+The obvious reading is that the Vs. Seeker rematches *any* defeated trainer while
+Match Call only handles registered ones. That is wrong.
+
+Both are bounded by the same `gRematchTable`. `GetRematchTrainerIdVSSeeker`
+(`vs_seeker.c:567`) looks the trainer up in that table and **returns 0 if there is
+no entry** — the trainer just shows the "no rematch" emote. It additionally bails
+on anything at or past `REMATCH_ELITE_FOUR_ENTRIES`, so the Vs. Seeker cannot
+rematch an Elite Four member at all. Match Call is strictly wider.
+
+**The real ceiling is the saveblock.** `gRematchTable` holds **78** entries;
+`MAX_REMATCH_ENTRIES` is **100**, and `SaveBlock1` already carries
+`u8 trainerRematches[100]`. So there are **22 free slots that cost nothing** —
+enough for Kanto's 8 leaders, 4 Elite Four and champion. Exceeding 100 *is*
+save-breaking.
+
+Kanto's ~150 ordinary route trainers cannot be covered by either system.
+
+`I_VS_SEEKER_CHARGING` stays `0`. Note it only diverts the *rematch* path anyway,
+and only once the player actually holds the item — the Pokénav's phone calls are
+unaffected either way.
 
 ### Two things enabled with wider reach than expected
 

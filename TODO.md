@@ -140,6 +140,16 @@ Kanto absorbs the overflow instead.
 - [ ] **Endgame QoL batch** — most wants are already expansion config flags in
       `include/config/`. Collect them here as they come up, flip in one pass.
       See QOL.md for the full survey of what exists.
+- [ ] **Add Kanto's leaders + E4 to the rematch table** — do this alongside the
+      Kanto E4 conversion. `gRematchTable` holds **78 of `MAX_REMATCH_ENTRIES`
+      (100)**, and the saveblock array is already `u8 trainerRematches[100]`, so
+      there are **22 free save-safe slots** — enough for 8 leaders + 4 E4 +
+      champion = 13. Going past 100 *is* save-breaking.
+      **Decided: Match Call, not Vs. Seeker.** Both are bounded by the same
+      table — `GetRematchTrainerIdVSSeeker` (`vs_seeker.c:567`) returns 0 for any
+      trainer with no table entry, so the Vs. Seeker does not work on arbitrary
+      trainers either, *and* it excludes Elite Four entries. Match Call is
+      strictly wider. `I_VS_SEEKER_CHARGING` stays `0`.
 - [ ] **Infinite TMs via vendors, NOT reusability.** Decided 2026-07-26.
       `I_REUSABLE_TMS` stays `FALSE` and the TM *relearner* stays off — both are
       back doors to the same thing. Instead, TM shops should stock every TM in
