@@ -63,10 +63,12 @@ Scope discipline is what decides whether this project ships.
             ✅ **VERIFIED IN-GAME 2026-07-26** — battle runs and the badge awards.
             The badge reroute through `DefeatedBrock` works, so the remaining
             gyms can copy this pattern with confidence.
-      - [ ] Apply the same pattern to the remaining 7 gyms (Cerulean, Vermilion,
-            Celadon, Fuchsia, Saffron, Cinnabar, Viridian). Mechanical now:
-            check defeated-flag up front → msgbox intro → `trainerbattle_two_trainers`
-            → `goto` the existing Defeated* script so the badge still awards.
+      - [x] **All 8 gyms are now double battles.** Commit `cfecc01551`.
+            Cerulean/Bugsy, Vermilion/Whitney, Celadon/Morty, Fuchsia/Janine,
+            Saffron/Jasmine, Cinnabar/Pryce, Viridian/Clair. Clean rebuild
+            verified; SaveBlock1 unchanged, so existing saves stay valid.
+      - [ ] ⚠️ Only Pewter has been played. The other 7 are built and verified to
+            compile but **untested in-game** — worth a pass through each.
       - [ ] Elite Four (4 pairs) + Champion (Blue + Red)
       - [ ] Region map graphics
       - [ ] Replace the 11 placeholder trainer sprites with real GBA-style art

@@ -16,7 +16,7 @@ assets.** See [Legal](#legal) below.
 | **IVs** | Every Pokémon has perfect 31s — player, wild, gift, and enemy trainers |
 | **Starters** | Kanto starter from Mr. Stone; Johto starter from Steven on Route 118 |
 | **Kanto** | All 417 FRLG maps compiled into the Emerald ROM, reachable postgame by ferry from Lilycove |
-| **Kanto gyms** | Being converted to double battles pairing each Kanto leader with their Johto counterpart |
+| **Kanto gyms** | All 8 are double battles pairing each Kanto leader with their Johto counterpart |
 
 Johto as a walkable region is **cancelled** — its cast is delivered through the
 Kanto double-battle pairings instead, at a fraction of the cost.
@@ -56,7 +56,7 @@ branched from tag `expansion/1.16.2`:
 
 Every commit hash referenced in these documents resolves there. The full delta from
 upstream is
-[14 commits](https://github.com/rh-hideout/pokeemerald-expansion/compare/expansion/1.16.2...gorepaw:pokeemerald-expansion:emerald-plus),
+[15 commits](https://github.com/rh-hideout/pokeemerald-expansion/compare/expansion/1.16.2...gorepaw:pokeemerald-expansion:emerald-plus),
 or `git diff expansion/1.16.2` in a local checkout.
 
 ## Legal
