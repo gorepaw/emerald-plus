@@ -49,10 +49,15 @@ likely to be useful to someone else:
 
 ## Source
 
-The engine changes live on branch `emerald-plus` of a `pokeemerald-expansion`
-checkout, branched from tag `expansion/1.16.2`. Commit hashes referenced throughout
-these documents point there. `git diff expansion/1.16.2` shows the full delta from
-upstream.
+The engine changes live on branch `emerald-plus` of a pokeemerald-expansion fork,
+branched from tag `expansion/1.16.2`:
+
+**[github.com/gorepaw/pokeemerald-expansion @ `emerald-plus`](https://github.com/gorepaw/pokeemerald-expansion/tree/emerald-plus)**
+
+Every commit hash referenced in these documents resolves there. The full delta from
+upstream is
+[14 commits](https://github.com/rh-hideout/pokeemerald-expansion/compare/expansion/1.16.2...gorepaw:pokeemerald-expansion:emerald-plus),
+or `git diff expansion/1.16.2` in a local checkout.
 
 ## Legal
 
