@@ -149,3 +149,94 @@ declared unconditionally), but yields mixed art styles in the same battle.
   save backend.
 - If accuracy bugs appear, stock also ships RetroArch; switching GBA to the
   **mGBA** core is a config change, not a redesign.
+
+---
+
+# Working notes
+
+Hard-won gotchas. Each of these cost real time at least once.
+
+## ⚠️ A stale save looks exactly like a graphics bug
+
+Garbage tiles, missing NPCs, a player that can't move, being unable to leave a
+building — all of it is what a save written against an older saveblock layout
+looks like. It is **not** a rendering or map-integration problem.
+
+Anything touching `TRAINER_FLAGS_END`, `FLAGS_COUNT` or `VARS_COUNT` shifts every
+offset after it. **Delete `emerald-plus.sav` and start fresh.** Cost most of a
+session before being identified.
+
+Conversely, pure script/data work (e.g. the gym conversions) leaves SaveBlock1
+untouched and saves stay valid. Check with:
+
+```bash
+arm-none-eabi-nm --print-size pokeemerald.elf | grep ' gSaveblock1$'
+# subtract 128 (the ASLR pad); capacity is 3968*4 = 15872
+```
+
+## The Bash tool is Git Bash, not WSL
+
+`arm-none-eabi-*`, `make` and the repo itself live in WSL. Running them through
+the Bash tool **fails silently** — `nm` returned "no symbols" for tilesets that
+were present, which sent one investigation down a false path. Always:
+
+```
+wsl -d Ubuntu -u lando --cd "~/decomps/pokeemerald-expansion" -- <cmd>
+```
+
+For anything with quoting, write a `.sh` to the scratchpad and run that instead.
+
+## Editing over `\\wsl.localhost\...` changes file ownership to root
+
+The Read/Edit tools work fine over the UNC path, but files they write become
+`root:root`. `make` still builds (it only reads), but Python/shell scripts
+running as `lando` get `PermissionError`. Fix:
+
+```bash
+wsl -d Ubuntu -u root -- chown -R lando:lando /home/lando/decomps/pokeemerald-expansion
+```
+
+## mGBA holds a lock on the ROM
+
+Copying a new build over `emerald-plus.gba` while mGBA has it open fails with
+`cp: Invalid argument`. Without `set -e` the script carries on and reports
+success. **Close mGBA, copy, then relaunch** — and verify with an MD5 compare.
+
+## Two repos, on opposite sides of the WSL boundary
+
+| | Location | Remote |
+|---|---|---|
+| Engine | `~/decomps/pokeemerald-expansion` (WSL) | push `fork`, pull `origin` (rh-hideout) |
+| Docs | `C:\Users\lando\Desktop\emerald+` (Windows) | `origin` → gorepaw/emerald-plus |
+
+Both are **public**; pushes authenticate silently, so treat `git push` as
+publishing. After engine commits, bump the "N commits" compare link in the
+README so it stays honest.
+
+## File-format traps
+
+- **`.party` files have no comment syntax.** `@` is the held-item separator
+  (`Metagross @ Sitrus Berry`), so a comment line parses as species-@-item. The
+  file says so at line 72.
+- **`#pragma` cannot appear inside a brace initializer.** For per-file warning
+  suppression use the Makefile idiom already in the tree:
+  `$(C_BUILDDIR)/data.o: override CFLAGS += -Wno-override-init`
+
+## The recurring bug class: version-gated FRLG data
+
+FRLG data is gated behind `#if IS_FRLG` all over the tree, so it simply doesn't
+exist in an Emerald build. This has bitten **six** times: tilesets, trainer
+tables, map scripts, object-event graphics, object-event palettes, and door
+animations. Symptoms range from link errors to NULL derefs to wrong colours.
+
+When anything Kanto misbehaves, grep first:
+
+```bash
+grep -rn "#if IS_FRLG" src/ include/ | grep -i <subsystem>
+```
+
+Most blocks are additive (no `#else`) and can simply be enabled. Where there *is*
+an `#else`, check for symbol collisions before merging both branches.
+
+**Known and deliberately left:** `field_door.c:333` still has `#if !IS_FRLG /
+#else`, so Kanto building doors don't animate. Warps work; it's cosmetic.

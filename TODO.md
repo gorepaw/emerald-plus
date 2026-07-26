@@ -1,5 +1,37 @@
 # emerald+ — running TODO
 
+## ▶ RESUME HERE
+
+**State as of 2026-07-26:** engine fork at `cfecc01551`, **15 commits** since
+`expansion/1.16.2`, both repos pushed and clean. ROM 84.76%, SaveBlock1
+15,744/15,872 (128 free). Kanto is walkable postgame via the Lilycove ferry and
+all 8 gyms are Kanto+Johto double battles.
+
+**Next task: the Elite Four + Champion.** Same restructure as the gyms — see
+"Kanto postgame" below and PLAN.md for the pairing table.
+
+| Slot | Kanto | Johto |
+|---|---|---|
+| E4 1 | Lorelei | Will |
+| E4 2 | Bruno | Karen |
+| E4 3 | Agatha | Koga |
+| E4 4 | Lance | Chuck |
+| Champion | Blue | **Red** |
+
+All five Johto-side trainers already exist (`TRAINER_JOHTO_WILL`, `_KAREN`,
+`_KOGA`… wait — Koga is a *Kanto* leader trainer, `TRAINER_LEADER_KOGA`, reused
+here; that is canonical, he was promoted to the Johto E4 in GSC) plus
+`TRAINER_JOHTO_CHUCK` and `TRAINER_JOHTO_RED`. Red already has a real sprite.
+
+⚠️ E4 rooms differ from gyms — they likely use `trainerbattle_continue_script`
+or map-script triggers rather than a plain `trainerbattle_single`, and the
+champion sequence has a long post-battle cutscene. **Survey the scripts first**,
+as was done for the gyms; do not assume the gym pattern transfers unchanged.
+
+Also still unplayed: 7 of the 8 gyms (only Pewter has been tested in-game).
+
+---
+
 The catch-all for the "scattered and ever-growing list of small things."
 Write it down here the moment it occurs to you; batch the work later.
 Scope discipline is what decides whether this project ships.
