@@ -107,7 +107,23 @@ Scope discipline is what decides whether this project ships.
             as NULL. Table is now 86 entries (53 + 32 + terminator). No code
             changes needed — every draw path already branched on
             `mapLayout->isFrlg`. ROM-only (`.data`/`.bss` both 0), saves valid.
+      - [ ] ⚠️ **Kanto and Hoenn share the same eight badge flags.**
+            `PewterCity_Gym_Frlg` sets `FLAG_BADGE01_GET` — the same flag
+            Roxanne sets. All 8 Kanto gyms do this. Three consequences:
+            1. Route 23's seven guards check `FLAG_BADGE0[2-8]_GET`, already set
+               from Hoenn, so **they all wave the player straight through**.
+            2. The Kanto E4 is therefore reachable the moment you land in
+               Vermilion, with zero Kanto gyms beaten. Any "after the Kanto
+               league" gate is much weaker than it looks.
+            3. It explains the trainer card showing Hoenn badges — they are
+               literally the same eight bits.
+            Fix is its own job: 8 new flags, 8 gym scripts, the Route 23 guards,
+            and trainer card work. Do this **before** balancing the Kanto E4.
       - [ ] Elite Four (4 pairs) + Champion (Blue + Red)
+            ⚠️ The Kanto Hall of Fame script sets `FLAG_POKE_RIDER`
+            (Fly-from-region-map). It lives there rather than in the Champion's
+            Room precisely so this conversion won't disturb it — **don't drop
+            it** if you touch `PokemonLeague_HallOfFame_Frlg`.
       - [ ] Region map graphics
       - [ ] Replace the 11 placeholder trainer sprites with real GBA-style art
       - [ ] **Trainer card still shows the Hoenn badge list** while earning Kanto

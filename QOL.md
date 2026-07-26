@@ -163,9 +163,10 @@ but is inert until you point a config at a real flag/var ID. A `0` means "off."
 | `FLAG_POKE_RIDER` | `0x24` | `OW_FLAG_POKE_RIDER` |
 | `FLAG_ORAS_DOWSING_ACTIVE` | `0x25` | `I_ORAS_DOWSING_FLAG` |
 
-The first three are set in `NewGameInitData` (after `InitEventData`, which clears
-every flag). **They only apply to a new game** — existing saves need them set via
-the debug menu.
+`FLAG_EGG_MOVE_RELEARNER` and `FLAG_TUTOR_MOVE_RELEARNER` are set in
+`NewGameInitData` (after `InitEventData`, which clears every flag), so **they only
+apply to a new game** — existing saves need them set via the debug menu.
+`FLAG_POKE_RIDER` is set by the Kanto Hall of Fame script instead, as a reward.
 
 ⚠️ `FLAG_ORAS_DOWSING_ACTIVE` is **runtime state, not an enable switch**, despite
 sitting among the enable flags. The feature turns on by the config being non-zero;
@@ -345,10 +346,12 @@ time to restore the intended curve.
 - **Fly-from-region-map does not require Fly.** It checks
   `MAPSECTYPE_CITY_CANFLY` (so only already-visited cities) and the flag, but
   never checks for HM Fly or a flier in the party
-  (`pokenav_region_map.c:223`). With the flag set at new game it works from the
-  moment the Pokénav arrives, around gym 2. To tie it to actually having Fly,
-  move the `FlagSet` out of `NewGameInitData` and into the HM02 script or the
-  Feather Badge award.
+  (`pokenav_region_map.c:223`). It is therefore gated purely by when the flag
+  gets set. **Resolved:** `FLAG_POKE_RIDER` is now set by the Kanto Hall of Fame
+  script, making it a reward for clearing the Kanto league rather than something
+  available from gym 2. Oak explains the unlock in a second message.
+  ⚠️ But see TODO.md — Kanto and Hoenn share badge flags, so the Kanto league is
+  reachable earlier than intended.
 
 ### Learnsets
 
