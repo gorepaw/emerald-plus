@@ -124,6 +124,13 @@ Kanto absorbs the overflow instead.
       folding into the hidden-area system below.
 - [ ] **Endgame QoL batch** — most wants are already expansion config flags in
       `include/config/`. Collect them here as they come up, flip in one pass.
+      See QOL.md for the full survey of what exists.
+- [ ] **Infinite TMs via vendors, NOT reusability.** Decided 2026-07-26.
+      `I_REUSABLE_TMS` stays `FALSE` and the TM *relearner* stays off — both are
+      back doors to the same thing. Instead, TM shops should stock every TM in
+      unlimited quantity. To be done when we reach that part of the game.
+      ⚠️ Don't "helpfully" set `P_ENABLE_MOVE_RELEARNERS TRUE` — it switches the
+      TM relearner on as a side effect.
 
 ## Later
 

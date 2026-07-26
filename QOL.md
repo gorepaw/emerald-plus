@@ -117,8 +117,31 @@ Nothing here is enabled. These are the real choices left.
 The entire ORAS/Gen 6 berry system is present and fully off:
 `OW_BERRY_MUTATIONS`, `OW_BERRY_MOISTURE`, `OW_BERRY_WEEDS`, `OW_BERRY_PESTS`,
 `OW_BERRY_MULCH_USAGE`, `OW_BERRY_SIX_STAGES`, `OW_BERRY_IMMORTAL`. Growth and
-yield are pinned to `GEN_3`. `OW_BERRY_IMMORTAL` alone is a solid quality win —
-trees stop vanishing unpicked.
+yield are pinned to `GEN_3`.
+
+✅ **All of it is save-safe.** `struct BerryTree` (`global.berry.h:85`) already
+allocates `weeds`, `mulch`, `mutationA`, `mutationB`, `pests`, `moistureLevel`
+and `moistureClock` unconditionally — the storage exists and is simply unused
+while the configs are off. Enabling them shifts no offsets.
+
+| Setting | What it adds |
+|---|---|
+| `OW_BERRY_IMMORTAL` | Grown trees never vanish unpicked. Pure quality win, no upkeep |
+| `OW_BERRY_MOISTURE` | Watering becomes about keeping soil moist, not once per stage. The gateway setting — several others only matter with it on |
+| `OW_BERRY_ALWAYS_WATERABLE` | With moisture on: `FALSE` = Gen 6 (water when dry, raises yield), `TRUE` = Gen 4 (water freely, drying lowers yield) |
+| `OW_BERRY_DRAIN_RATE` | How fast soil dries. `GEN_6_ORAS` = 4 hours, `GEN_6_XY` = 24 hours, `GEN_4` = per-berry |
+| `OW_BERRY_MUTATIONS` | Adjacent plantings can mutate into different berries. `OW_BERRY_MUTATION_CHANCE` defaults to 25% |
+| `OW_BERRY_WEEDS` | Weeds appear and need pulling; ignoring them cuts yield |
+| `OW_BERRY_PESTS` | Pests appear and need clearing; ignoring them cuts yield |
+| `OW_BERRY_MULCH_USAGE` | Mulch becomes usable fertiliser. Without it, Mulch items are inert |
+| `OW_BERRY_SIX_STAGES` | XY's six growth stages instead of four. Does **not** change total grow time |
+| `OW_BERRY_GROWTH_RATE` / `OW_BERRY_YIELD_RATE` | Currently `GEN_3`. Later presets grow faster and yield more |
+| `OW_BERRY_COLORS` | Cosmetic — restores ~19 berries' Gen 6 colours |
+
+The split that matters: `IMMORTAL`, `GROWTH_RATE`, `YIELD_RATE` and `COLORS` are
+**pure convenience**. `MOISTURE`, `WEEDS`, `PESTS` and `MULCH` are **upkeep** —
+they make berry growing an active minigame with more reward and more chores.
+`MUTATIONS` is the one that adds genuine discovery.
 
 ---
 
@@ -126,6 +149,28 @@ trees stop vanishing unpicked.
 
 This is the least obvious category and the easiest to overlook: the code ships,
 but is inert until you point a config at a real flag/var ID. A `0` means "off."
+
+**Flags claimed so far** (block continues from the starter gifts at `0x20`–`0x21`):
+
+| Flag | ID | Drives |
+|---|---|---|
+| `FLAG_EGG_MOVE_RELEARNER` | `0x22` | `P_FLAG_EGG_MOVES` |
+| `FLAG_TUTOR_MOVE_RELEARNER` | `0x23` | `P_FLAG_TUTOR_MOVES` |
+| `FLAG_POKE_RIDER` | `0x24` | `OW_FLAG_POKE_RIDER` |
+| `FLAG_ORAS_DOWSING_ACTIVE` | `0x25` | `I_ORAS_DOWSING_FLAG` |
+
+The first three are set in `NewGameInitData` (after `InitEventData`, which clears
+every flag). **They only apply to a new game** — existing saves need them set via
+the debug menu.
+
+⚠️ `FLAG_ORAS_DOWSING_ACTIVE` is **runtime state, not an enable switch**, despite
+sitting among the enable flags. The feature turns on by the config being non-zero;
+`oras_dowse.c` sets and clears the flag as dowsing starts and stops. Never set it
+at new game.
+
+⚠️ **Finding free flags:** a naive grep reports most `FLAG_UNUSED_*` as in use.
+Those hits are declarations in `flags_frlg.h`, not real uses. Exclude both flag
+headers when checking.
 
 | Config | Gives you |
 |---|---|
@@ -258,6 +303,21 @@ roughly 195 species caught — very early for this hack.
 
 If it is ever re-enabled, set `B_CRITICAL_CAPTURE_LOCAL_DEX FALSE` at the same
 time to restore the intended curve.
+
+### Two things enabled with wider reach than expected
+
+- **The egg/tutor relearner flags also light up the summary screen.**
+  `pokemon_summary_screen.c:4868` shares the same condition, so egg and tutor
+  moves are relearnable from the party menu, free, anywhere — not just at the
+  Fallarbor NPC with Heart Scales. If that proves too strong, set
+  `P_SUMMARY_SCREEN_MOVE_RELEARNER FALSE` to restrict it back to the NPC.
+- **Fly-from-region-map does not require Fly.** It checks
+  `MAPSECTYPE_CITY_CANFLY` (so only already-visited cities) and the flag, but
+  never checks for HM Fly or a flier in the party
+  (`pokenav_region_map.c:223`). With the flag set at new game it works from the
+  moment the Pokénav arrives, around gym 2. To tie it to actually having Fly,
+  move the `FlagSet` out of `NewGameInitData` and into the HM02 script or the
+  Feather Badge award.
 
 ### Learnsets
 
