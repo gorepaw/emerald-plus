@@ -1,5 +1,20 @@
 # emerald+ — testing guide
 
+> ## ⚠️ Start a NEW GAME after any saveblock change
+>
+> **Symptoms of a stale save:** garbage tiles, missing NPCs, a player sprite that
+> can't move, being unable to leave a building. It looks exactly like a graphics
+> or map-integration bug, and it is not one.
+>
+> Confirmed 2026-07-26: what appeared to be broken Kanto tile rendering was
+> entirely a save written before the trainer/flag namespace merge. On a fresh
+> file the same build is clean — Kanto renders correctly and the Pewter double
+> battle awards the badge.
+>
+> Anything that moves `TRAINER_FLAGS_END`, `FLAGS_COUNT` or `VARS_COUNT` shifts
+> every offset after it, so old saves misread their own data. **Delete or rename
+> `emerald-plus.sav` whenever the build's saveblock layout changes.**
+
 mGBA 0.10.5 is installed at `C:\Program Files\mGBA\mGBA.exe` and has been launched
 with `emerald-plus.gba`. To relaunch:
 
@@ -83,6 +98,14 @@ when the namespaces were merged.
 Layout landmarks: `TRAINER_FLAGS_START` 1280, `SYSTEM_FLAGS` 2816,
 `FRLG_FLAGS_START` 3072, `FLAGS_COUNT` 3786.
 `TRAINER_LEADER_BROCK` 1169, `TRAINER_JOHTO_FALKNER` 1479.
+
+## Verified working (2026-07-26, fresh save)
+
+- ✅ Ferry menu lists VERMILION CITY; crossing works
+- ✅ Kanto is walkable — tiles, NPCs and cut trees all render correctly
+- ✅ **Pewter Gym: Brock + Falkner double battle runs and awards the badge**
+
+Known cosmetic gap: the trainer card still shows Hoenn badges.
 
 ## What to check
 

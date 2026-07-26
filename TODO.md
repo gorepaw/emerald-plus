@@ -60,7 +60,9 @@ Scope discipline is what decides whether this project ships.
             from `trainers.h` *or* `trainers_frlg.h`, never both, so the Kanto
             gym leaders had NO teams in an Emerald build. Fixed in `4499e2b2cd`.
       - [x] **Pewter Gym = Brock + Falkner double battle.** Commit `bfe810d733`.
-            Proof of the pattern; clean rebuild verified.
+            ✅ **VERIFIED IN-GAME 2026-07-26** — battle runs and the badge awards.
+            The badge reroute through `DefeatedBrock` works, so the remaining
+            gyms can copy this pattern with confidence.
       - [ ] Apply the same pattern to the remaining 7 gyms (Cerulean, Vermilion,
             Celadon, Fuchsia, Saffron, Cinnabar, Viridian). Mechanical now:
             check defeated-flag up front → msgbox intro → `trainerbattle_two_trainers`
@@ -68,6 +70,9 @@ Scope discipline is what decides whether this project ships.
       - [ ] Elite Four (4 pairs) + Champion (Blue + Red)
       - [ ] Region map graphics
       - [ ] Replace the 11 placeholder trainer sprites with real GBA-style art
+      - [ ] **Trainer card still shows the Hoenn badge list** while earning Kanto
+            badges. Cosmetic; a Kanto badge display is wanted eventually but is
+            explicitly low priority.
 - [ ] **Stock Kanto with the miscellaneous wild Pokémon** (Gen 4–9 etc.), so
       everything is catchable without cluttering Hoenn.
 
