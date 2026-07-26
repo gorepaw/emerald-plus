@@ -13,7 +13,7 @@ assets.** See [Legal](#legal) below.
 |---|---|
 | **Species** | All 9 generations (1,029), DS-style art |
 | **Shiny rate** | 1/512 (≈1/171 with the Shiny Charm) |
-| **IVs** | Every Pokémon has perfect 31s — player, wild, gift, and enemy trainers |
+| **IVs** | Every Pokémon rolls 30 or 31 in each stat — player, wild, gift, and enemy trainers. The 30s exist only to keep Hidden Power's type varied |
 | **Battle style** | No physical/special split — damage class is by type, as in Gen 1–3 |
 | **EXP** | Gen 3 rules: split among participants, unscaled, 1.5× from trainers, none for catching, Gen 3–5 held-item Exp. Share |
 | **Kept from Gen 3** | Badge stat boosts, overworld poison damage, no affection mechanics, no Critical Capture |
@@ -61,7 +61,7 @@ branched from tag `expansion/1.16.2`:
 
 Every commit hash referenced in these documents resolves there. The full delta from
 upstream is
-[19 commits](https://github.com/rh-hideout/pokeemerald-expansion/compare/expansion/1.16.2...gorepaw:pokeemerald-expansion:emerald-plus),
+[21 commits](https://github.com/rh-hideout/pokeemerald-expansion/compare/expansion/1.16.2...gorepaw:pokeemerald-expansion:emerald-plus),
 or `git diff expansion/1.16.2` in a local checkout.
 
 ## Legal

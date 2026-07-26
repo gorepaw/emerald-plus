@@ -124,13 +124,17 @@ allocates `weeds`, `mulch`, `mutationA`, `mutationB`, `pests`, `moistureLevel`
 and `moistureClock` unconditionally — the storage exists and is simply unused
 while the configs are off. Enabling them shifts no offsets.
 
+**Enabled here:** `OW_BERRY_IMMORTAL` and `OW_BERRY_MUTATIONS` — the two that add
+value without adding upkeep. Both verified independent of `OW_BERRY_MOISTURE`,
+which stays off, so there is no watering schedule, no weeds and no pests.
+
 | Setting | What it adds |
 |---|---|
-| `OW_BERRY_IMMORTAL` | Grown trees never vanish unpicked. Pure quality win, no upkeep |
+| ✅ `OW_BERRY_IMMORTAL` | Grown trees never vanish unpicked. Pure quality win, no upkeep |
 | `OW_BERRY_MOISTURE` | Watering becomes about keeping soil moist, not once per stage. The gateway setting — several others only matter with it on |
 | `OW_BERRY_ALWAYS_WATERABLE` | With moisture on: `FALSE` = Gen 6 (water when dry, raises yield), `TRUE` = Gen 4 (water freely, drying lowers yield) |
 | `OW_BERRY_DRAIN_RATE` | How fast soil dries. `GEN_6_ORAS` = 4 hours, `GEN_6_XY` = 24 hours, `GEN_4` = per-berry |
-| `OW_BERRY_MUTATIONS` | Adjacent plantings can mutate into different berries. `OW_BERRY_MUTATION_CHANCE` defaults to 25% |
+| ✅ `OW_BERRY_MUTATIONS` | Adjacent plantings can mutate into different berries. `OW_BERRY_MUTATION_CHANCE` defaults to 25% |
 | `OW_BERRY_WEEDS` | Weeds appear and need pulling; ignoring them cuts yield |
 | `OW_BERRY_PESTS` | Pests appear and need clearing; ignoring them cuts yield |
 | `OW_BERRY_MULCH_USAGE` | Mulch becomes usable fertiliser. Without it, Mulch items are inert |
@@ -260,13 +264,40 @@ Interactions worth knowing, found by reading the code rather than guessing.
 `P_ALL_PERFECT_IVS TRUE` already renders Hyper Training, the IV judge and Destiny
 Knot inheritance meaningless. Two further consequences:
 
-- **Every Hidden Power is Dark-type.** The type comes from the low bit of each
-  of the six IVs (`battle_main.c:5856`). All-31 means all bits set, `typeBits`
-  is always 63, so the index always lands on the last eligible type — Dark. This
-  applies to enemy trainers too. Under our no-split rule Dark is Special, so it
-  stays a usable special attack, but it is no longer *variable*.
+- **Hidden Power needed rescuing — see below.**
 - `P_SUMMARY_SCREEN_IV_EV_INFO` is still worth enabling for the **EV** half; EVs
   remain fully in play even though IVs don't.
+
+### Hidden Power and the 30/31 fix
+
+Hidden Power's type comes from **bit 0 of each of the six IVs**
+(`battle_main.c:5856`). A flat 31 spread sets every bit, so `typeBits` was always
+63 and every Hidden Power in the game — yours and every trainer's — was **Dark**.
+
+Fixed with `P_PERFECT_IVS_VARY_FOR_HIDDEN_POWER TRUE`: each IV is now 30 or 31 at
+random. Bit 0 varies again, all 16 types return, and the cost is at most one IV
+point per stat — one stat point at level 100, less below.
+
+Applied at the same single choke point as `P_ALL_PERFECT_IVS`, so it covers wild
+encounters, gifts, eggs, static legendaries, enemy trainers and Frontier mons.
+
+**The distribution is not uniform**, and this is inherent to the vanilla
+`(15 * typeBits) / 63` formula rather than anything we did:
+
+| Type | Chance |
+|---|---|
+| Fighting, Bug, Grass | 7.8% each |
+| Flying, Poison, Ground, Rock, Ghost, Steel, Fire, Water, Electric, Psychic, Ice, Dragon | 6.2% each |
+| **Dark** | **1.6%** — only `typeBits == 63` reaches it |
+
+So Dark went from guaranteed to the rarest type.
+
+⚠️ **The type cannot be bred for.** Eggs use this same code path, so it is random
+per Pokémon. Re-rolling means catching or hatching again, not chaining parents.
+
+`P_SHOW_DYNAMIC_TYPES` was turned `TRUE` alongside it — without that, Hidden Power
+displays as Normal and a randomised type would be invisible, which is strictly
+worse than a predictable one. It also affects Weather Ball, Judgment and similar.
 
 ### No physical/special split
 
