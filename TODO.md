@@ -2,10 +2,10 @@
 
 ## ▶ RESUME HERE
 
-**State as of 2026-07-26:** engine fork at `cfecc01551`, **15 commits** since
-`expansion/1.16.2`, both repos pushed and clean. ROM 84.76%, SaveBlock1
-15,744/15,872 (128 free). Kanto is walkable postgame via the Lilycove ferry and
-all 8 gyms are Kanto+Johto double battles.
+**State as of 2026-07-26:** engine fork at `271d00bdf9`, **16 commits** since
+`expansion/1.16.2`, both repos pushed and clean. ROM 84.81%, SaveBlock1
+15,744/15,872 (128 free). Kanto is walkable postgame via the Lilycove ferry,
+all 8 gyms are Kanto+Johto double battles, and Kanto doors now animate.
 
 **Next task: the Elite Four + Champion.** Same restructure as the gyms — see
 "Kanto postgame" below and PLAN.md for the pairing table.
@@ -101,6 +101,12 @@ Scope discipline is what decides whether this project ships.
             verified; SaveBlock1 unchanged, so existing saves stay valid.
       - [ ] ⚠️ Only Pewter has been played. The other 7 are built and verified to
             compile but **untested in-game** — worth a pass through each.
+      - [x] **Kanto doors animate.** Commit `271d00bdf9`. `sDoorAnimGraphicsTable`
+            was `#if !IS_FRLG / #else`, so an Emerald build carried only Hoenn's
+            53 door entries and every Kanto door fell out of `GetDoorGraphics`
+            as NULL. Table is now 86 entries (53 + 32 + terminator). No code
+            changes needed — every draw path already branched on
+            `mapLayout->isFrlg`. ROM-only (`.data`/`.bss` both 0), saves valid.
       - [ ] Elite Four (4 pairs) + Champion (Blue + Red)
       - [ ] Region map graphics
       - [ ] Replace the 11 placeholder trainer sprites with real GBA-style art

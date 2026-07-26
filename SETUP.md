@@ -166,13 +166,24 @@ Anything touching `TRAINER_FLAGS_END`, `FLAGS_COUNT` or `VARS_COUNT` shifts ever
 offset after it. **Delete `emerald-plus.sav` and start fresh.** Cost most of a
 session before being identified.
 
-Conversely, pure script/data work (e.g. the gym conversions) leaves SaveBlock1
-untouched and saves stay valid. Check with:
+Conversely, pure script/data work (e.g. the gym conversions, the door merge)
+leaves SaveBlock1 untouched and saves stay valid.
+
+⚠️ **Don't use `nm ... | grep gSaveblock1` to check this.** That symbol is
+`SaveBlock1ASLR`, a fixed-size container, so it always reports `0x3e00` (15872)
+no matter what the layout does — a check that cannot fail. What you actually
+want is whether the change touched RAM at all:
 
 ```bash
-arm-none-eabi-nm --print-size pokeemerald.elf | grep ' gSaveblock1$'
-# subtract 128 (the ASLR pad); capacity is 3968*4 = 15872
+arm-none-eabi-size -A build/emerald/src/<file>.o | grep -E '\.data|\.bss'
 ```
+
+`.data = 0` and `.bss = 0` means the change is pure `.rodata` in ROM, so the
+saveblock is untouched by construction. Confirm the data landed in ROM with
+`nm pokeemerald.elf | grep <symbol>` — an `0x08...` address is cartridge.
+
+Only `flags[]`, `vars[]` and friends move offsets, i.e. anything touching
+`TRAINER_FLAGS_END`, `FLAGS_COUNT` or `VARS_COUNT`.
 
 ## The Bash tool is Git Bash, not WSL
 
@@ -225,18 +236,29 @@ README so it stays honest.
 ## The recurring bug class: version-gated FRLG data
 
 FRLG data is gated behind `#if IS_FRLG` all over the tree, so it simply doesn't
-exist in an Emerald build. This has bitten **six** times: tilesets, trainer
-tables, map scripts, object-event graphics, object-event palettes, and door
-animations. Symptoms range from link errors to NULL derefs to wrong colours.
-
-When anything Kanto misbehaves, grep first:
+exist in an Emerald build. **This is the single most productive thing to check
+when anything Kanto misbehaves** — it has now been the cause seven times:
+tilesets, trainer tables, map scripts, object-event graphics, object-event
+palettes, and door animations. Symptoms range from link errors to NULL derefs to
+wrong colours to "the feature silently does nothing."
 
 ```bash
 grep -rn "#if IS_FRLG" src/ include/ | grep -i <subsystem>
 ```
 
-Most blocks are additive (no `#else`) and can simply be enabled. Where there *is*
-an `#else`, check for symbol collisions before merging both branches.
+Two shapes, two fixes:
 
-**Known and deliberately left:** `field_door.c:333` still has `#if !IS_FRLG /
-#else`, so Kanto building doors don't animate. Warps work; it's cosmetic.
+- **Additive block** (no `#else`) — just enable it. Most are this.
+- **Either/or** (`#if !IS_FRLG ... #else ... #endif`) — the two halves must be
+  concatenated, not swapped. Before doing that, check the halves share no symbol
+  names, and check what disambiguates entries at runtime.
+
+House idiom for both: replace the condition with `#if 1` and leave a `// emerald+:`
+comment rather than deleting the directive, so the block boundaries still line up
+against upstream in a diff.
+
+**The runtime is often already region-aware even when the data isn't.** Before
+writing any branching logic, grep for `isFrlg` — `field_door.c` needed *zero*
+code changes because every draw path already branched on
+`gMapHeader.mapLayout->isFrlg`. Only the table was gated. `fieldmap.c`, `shop.c`
+and `fldeff_escalator.c` are region-aware the same way.
