@@ -29,15 +29,12 @@ realising they shipped.
 | `B_SHOW_TARGETS` | Spread moves highlight everything they'll hit before you commit |
 | `B_SHOW_CATEGORY_ICON` | Physical/special icon in summary and relearner |
 | `B_FAST_HP_DRAIN`, `B_FAST_EXP_GROW`, `B_FAST_INTRO_PKMN_TEXT` | Faster bars and intro |
-| `B_SPLIT_EXP` | Gen 6+: every participant gets **full** EXP, not a share |
-| `B_EXP_CATCH` | EXP for catching |
-| `B_SCALED_EXP` | EXP weighted by level difference |
-| `B_BADGE_BOOST` | Gen 4+: badges **no longer** inflate stats |
-| `B_CRITICAL_CAPTURE` | Critical captures enabled |
+| `B_CRITICAL_CAPTURE` | Critical captures enabled — see §4 |
 | `B_CATCH_SWAP_INTO_PARTY` | Swap a fresh catch straight into the party |
 | `B_RUN_TRAINER_BATTLE` | You *can* flee trainer battles (counts as a whiteout) |
-| `B_AFFECTION_MECHANICS` | Gen 6 affection effects |
 | `B_RECALCULATE_STATS` | Stats recalculated after each battle |
+| `B_TRAINER_EXP_MULTIPLIER` | Gen 7+: trainer battles get **no** 1.5× EXP bonus |
+| `B_UNEVOLVED_EXP_MULTIPLIER` | Gen 6+: 1.2× EXP for an unevolved mon past its evo level |
 | `B_MOVE_REARRANGEMENT_IN_BATTLE` | Gen 4+: move slots can't be reordered mid-battle |
 
 ### Overworld
@@ -45,13 +42,27 @@ realising they shipped.
 | Setting | What you get |
 |---|---|
 | `OW_RUNNING_INDOORS` | Run indoors |
-| `OW_POISON_DAMAGE` | Gen 5+: poison does **nothing** in the overworld |
 | `OW_CHOOSE_FROM_PC_AND_PARTY` | Tutors/traders can reach into your PC |
 | `OW_PC_HEAL` | Gen 8+: depositing does **not** heal — a rare non-QoL default |
 | `OW_WHITEOUT_CUTSCENE` | Gen 4+ whiteout handling |
 | `I_REPEL_LURE_MENU` | Pick which Repel to use when one runs out |
 | `OW_ENABLE_DNS` | Day/night overworld tinting |
-| `P_POKERUS_ENABLED` | Pokérus, with the vanilla bugs fixed |
+| `P_POKERUS_ENABLED` | Pokérus, with the two vanilla bugs fixed — see below |
+
+**The two Pokérus "bugs"**, both `TRUE` in vanilla Emerald and `FALSE` (fixed)
+here. Neither is worth restoring unless you want bug-for-bug fidelity:
+
+- **`P_POKERUS_HERD_IMMUNITY`** — vanilla picks a random party slot to infect
+  from *all* slots, including Pokémon that already had Pokérus and are now
+  immune. Landing on one wastes the roll entirely. So the more of your party has
+  been infected before, the *lower* your odds of a new infection. The fix
+  filters immune mons out of the candidate list first
+  (`pokerus.c:50`), keeping the rate constant.
+- **`P_POKERUS_WEAK_VARIANT`** — Pokérus has 16 strains, numbered from 0.
+  Vanilla tests "does this mon have a strain?", and strain **0** reads as
+  falsy, so a mon carrying strain 0 counts as uninfected and can be overwritten
+  by a spreading strain, resetting its remaining days. The fix tests the
+  Pokérus value as a whole instead (`pokerus.c:177`).
 
 ### Menus
 
@@ -141,6 +152,48 @@ this project — see the note in README.md. Flags are comfortable; vars are not.
 
 ---
 
+## 3b. Deliberately reverted to Gen 3
+
+Modern defaults this hack has turned back off. Listed separately so nobody
+"helpfully" restores them later.
+
+| Setting | Now | Effect |
+|---|---|---|
+| `B_SPLIT_EXP` | `GEN_3` | EXP splits among participants instead of full to each |
+| `B_SCALED_EXP` | `GEN_3` | Flat EXP. The divisor returns to **7** (vanilla), not 5 |
+| `B_EXP_CATCH` | `GEN_3` | No EXP for catching |
+| `B_BADGE_BOOST` | `GEN_3` | Badges boost stats again, +10% |
+| `B_AFFECTION_MECHANICS` | `FALSE` | No Gen 6 affection effects |
+| `OW_POISON_DAMAGE` | `GEN_3` | Poison damages in the overworld and **can faint** |
+| `B_PHYSICAL_SPECIAL_SPLIT` | `GEN_3` | Damage class by type |
+| `P_LVL_UP_LEARNSETS` | `GEN_3` | RSE movepools |
+
+**Exp. Share** is `I_EXP_SHARE_ITEM GEN_5` — the Gen 3–5 *held item*, which is
+what we want. Combined with `B_SPLIT_EXP GEN_3` this gives the classic split:
+half the EXP to participants, half shared among Exp. Share holders
+(`battle_script_commands.c:3928`).
+
+**Badge boost details.** +10%, player side only, excluded from link, e-reader,
+recorded and Frontier battles (`battle_util.c:8933`). Flags are vanilla Emerald's:
+
+| Stat | Badge |
+|---|---|
+| Attack | `BADGE01` — Stone (Roxanne) |
+| Speed | `BADGE03` — Dynamo (Wattson) |
+| Defense | `BADGE05` — Balance (Norman) |
+| Sp. Atk & Sp. Def | `BADGE07` — Mind (Tate & Liza) |
+
+These are **Hoenn** flags only, so the eight Kanto gyms grant no further boosts —
+by the time Kanto opens, all five are already active. The boost checks
+`IsBattleMovePhysical`/`IsBattleMoveSpecial`, which are now type-based, so it
+composes correctly with the no-split rule.
+
+**Still modern, not requested either way** — flag these if the EXP curve feels
+off: `B_TRAINER_EXP_MULTIPLIER` (vanilla gave trainer battles 1.5×; currently
+no bonus) and `B_UNEVOLVED_EXP_MULTIPLIER` (Gen 6's 1.2× is still on).
+
+---
+
 ## 4. Where this collides with decisions already made
 
 Interactions worth knowing, found by reading the code rather than guessing.
@@ -175,6 +228,24 @@ not a bug, and it's the price of the Gen 3 feel.
 
 `B_UPDATED_MOVE_DATA` is still `GEN_LATEST`, so moves keep their modern power and
 accuracy. Only the damage class reverted.
+
+### Critical Capture is stronger here than it looks
+
+`B_CRITICAL_CAPTURE TRUE` is a Gen 5 mechanic: catch odds are multiplied by
+0.5× / 1× / 1.5× / 2× / 2.5× depending on how much of the Pokédex you have
+**caught**, then divided by 6 and rolled. On success the ball shakes once and
+resolves immediately instead of three times. Below ~4.6% dex completion it never
+fires at all. The Catching Charm doubles the multiplier
+(`B_CATCHING_CHARM_BOOST 100`).
+
+The wrinkle: `B_CRITICAL_CAPTURE_LOCAL_DEX TRUE` compares your **national** caught
+count against the **regional** dex total (`battle_script_commands.c:9976-9994`).
+With 1,029 species enabled but a Hoenn-sized regional total, the top 2.5× tier is
+reached at roughly 195 species caught — very early for this hack. So Critical
+Capture will be considerably more impactful than the Gen 5 pacing intends.
+
+Setting `B_CRITICAL_CAPTURE_LOCAL_DEX FALSE` scales it against the national count
+instead, which restores the intended curve without disabling the feature.
 
 ### Learnsets
 

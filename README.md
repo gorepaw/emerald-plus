@@ -15,6 +15,8 @@ assets.** See [Legal](#legal) below.
 | **Shiny rate** | 1/512 (≈1/171 with the Shiny Charm) |
 | **IVs** | Every Pokémon has perfect 31s — player, wild, gift, and enemy trainers |
 | **Battle style** | No physical/special split — damage class is by type, as in Gen 1–3 |
+| **EXP** | Gen 3 rules: split among participants, unscaled, none for catching, Gen 3–5 held-item Exp. Share |
+| **Kept from Gen 3** | Badge stat boosts, overworld poison damage, no affection mechanics |
 | **Movepools** | Gen 1–3 species use authentic RSE learnsets; later species use their debut generation's |
 | **Starters** | Kanto starter from Mr. Stone; Johto starter from Steven on Route 118 |
 | **Kanto** | All 417 FRLG maps compiled into the Emerald ROM, reachable postgame by ferry from Lilycove |
