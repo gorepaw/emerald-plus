@@ -1,0 +1,11 @@
+# ROMs — base and built. Never commit these.
+*.gba
+*.gb
+*.gbc
+
+# Emulator saves and save states
+*.sav
+*.sav.bak-*
+*.ss[0-9]
+*.srm
+*.rtc
