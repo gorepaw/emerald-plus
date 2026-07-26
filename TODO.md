@@ -107,18 +107,17 @@ Scope discipline is what decides whether this project ships.
             as NULL. Table is now 86 entries (53 + 32 + terminator). No code
             changes needed — every draw path already branched on
             `mapLayout->isFrlg`. ROM-only (`.data`/`.bss` both 0), saves valid.
-      - [ ] ⚠️ **Kanto and Hoenn share the same eight badge flags.**
-            `PewterCity_Gym_Frlg` sets `FLAG_BADGE01_GET` — the same flag
-            Roxanne sets. All 8 Kanto gyms do this. Three consequences:
-            1. Route 23's seven guards check `FLAG_BADGE0[2-8]_GET`, already set
-               from Hoenn, so **they all wave the player straight through**.
-            2. The Kanto E4 is therefore reachable the moment you land in
-               Vermilion, with zero Kanto gyms beaten. Any "after the Kanto
-               league" gate is much weaker than it looks.
-            3. It explains the trainer card showing Hoenn badges — they are
-               literally the same eight bits.
-            Fix is its own job: 8 new flags, 8 gym scripts, the Route 23 guards,
-            and trainer card work. Do this **before** balancing the Kanto E4.
+      - [x] **Kanto has its own eight badge flags.** Commit `13417d5afd`.
+            `FLAG_KANTO_BADGE01_GET`–`08` at `0x26`–`0x2D`; 24 references
+            repointed across 10 files. Kanto progression is now real: Route 23's
+            guards gate on Kanto badges, and the Viridian Gym needs Kanto 2–7.
+            Obedience, level caps, the trainer card and the catch malus stay
+            Hoenn-only on purpose — the player has all 8 Hoenn badges before
+            Kanto opens, so Kanto badges are pure gating.
+            Save-safe: reused already-allocated `FLAG_UNUSED` ids, so
+            `FLAGS_COUNT` is unchanged.
+            ⚠️ Consequence: the **trainer card still shows Hoenn's eight and
+            never Kanto's**. Known, deferred, low priority.
       - [ ] Elite Four (4 pairs) + Champion (Blue + Red)
             ⚠️ The Kanto Hall of Fame script sets `FLAG_POKE_RIDER`
             (Fly-from-region-map). It lives there rather than in the Champion's

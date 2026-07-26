@@ -350,8 +350,9 @@ time to restore the intended curve.
   gets set. **Resolved:** `FLAG_POKE_RIDER` is now set by the Kanto Hall of Fame
   script, making it a reward for clearing the Kanto league rather than something
   available from gym 2. Oak explains the unlock in a second message.
-  ⚠️ But see TODO.md — Kanto and Hoenn share badge flags, so the Kanto league is
-  reachable earlier than intended.
+  The Kanto league is now a real gate: Kanto has its own eight badge flags
+  (`FLAG_KANTO_BADGE01_GET`–`08` at `0x26`–`0x2D`), so Route 23's guards and the
+  Viridian Gym check Kanto progress rather than Hoenn's.
 
 ### Learnsets
 
