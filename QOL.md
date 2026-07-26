@@ -29,12 +29,9 @@ realising they shipped.
 | `B_SHOW_TARGETS` | Spread moves highlight everything they'll hit before you commit |
 | `B_SHOW_CATEGORY_ICON` | Physical/special icon in summary and relearner |
 | `B_FAST_HP_DRAIN`, `B_FAST_EXP_GROW`, `B_FAST_INTRO_PKMN_TEXT` | Faster bars and intro |
-| `B_CRITICAL_CAPTURE` | Critical captures enabled — see §4 |
 | `B_CATCH_SWAP_INTO_PARTY` | Swap a fresh catch straight into the party |
 | `B_RUN_TRAINER_BATTLE` | You *can* flee trainer battles (counts as a whiteout) |
 | `B_RECALCULATE_STATS` | Stats recalculated after each battle |
-| `B_TRAINER_EXP_MULTIPLIER` | Gen 7+: trainer battles get **no** 1.5× EXP bonus |
-| `B_UNEVOLVED_EXP_MULTIPLIER` | Gen 6+: 1.2× EXP for an unevolved mon past its evo level |
 | `B_MOVE_REARRANGEMENT_IN_BATTLE` | Gen 4+: move slots can't be reordered mid-battle |
 
 ### Overworld
@@ -167,6 +164,16 @@ Modern defaults this hack has turned back off. Listed separately so nobody
 | `OW_POISON_DAMAGE` | `GEN_3` | Poison damages in the overworld and **can faint** |
 | `B_PHYSICAL_SPECIAL_SPLIT` | `GEN_3` | Damage class by type |
 | `P_LVL_UP_LEARNSETS` | `GEN_3` | RSE movepools |
+| `B_TRAINER_EXP_MULTIPLIER` | `GEN_3` | Trainer battles give the vanilla 1.5× bonus |
+| `B_UNEVOLVED_EXP_MULTIPLIER` | `GEN_3` | No Gen 6 1.2× for unevolved mons |
+| `B_CRITICAL_CAPTURE` | `FALSE` | No Critical Capture |
+| `B_CRITICAL_CAPTURE_IF_OWNED` | `GEN_3` | ⚠️ Must be set too — see below |
+
+⚠️ **`B_CRITICAL_CAPTURE FALSE` is not sufficient on its own.**
+`B_CRITICAL_CAPTURE_IF_OWNED >= GEN_9` is an **independent `||` branch** in
+`FinalizeCapture` (`battle_script_commands.c:9667`) that never consults
+`B_CRITICAL_CAPTURE`. Left at `GEN_LATEST` it still plays the one-shake critical
+animation on every catch of an already-owned species. Both must be set.
 
 **Exp. Share** is `I_EXP_SHARE_ITEM GEN_5` — the Gen 3–5 *held item*, which is
 what we want. Combined with `B_SPLIT_EXP GEN_3` this gives the classic split:
@@ -188,9 +195,14 @@ by the time Kanto opens, all five are already active. The boost checks
 `IsBattleMovePhysical`/`IsBattleMoveSpecial`, which are now type-based, so it
 composes correctly with the no-split rule.
 
-**Still modern, not requested either way** — flag these if the EXP curve feels
-off: `B_TRAINER_EXP_MULTIPLIER` (vanilla gave trainer battles 1.5×; currently
-no bonus) and `B_UNEVOLVED_EXP_MULTIPLIER` (Gen 6's 1.2× is still on).
+**Net effect on the EXP curve.** Base yield now divides by 7 instead of 5, splits
+across participants, and loses both the catch EXP and the 1.2× unevolved bonus —
+but regains the 1.5× trainer multiplier. Expect noticeably slower levelling than
+the expansion default, with trainer battles carrying much more of the load than
+wild grinding. That is the vanilla Emerald pacing.
+
+Still modern and untouched: `B_MAX_LEVEL_EV_GAINS`, `B_RECALCULATE_STATS`,
+`B_LEVEL_UP_NOTIFICATION`. None affect the curve.
 
 ---
 
@@ -229,23 +241,23 @@ not a bug, and it's the price of the Gen 3 feel.
 `B_UPDATED_MOVE_DATA` is still `GEN_LATEST`, so moves keep their modern power and
 accuracy. Only the damage class reverted.
 
-### Critical Capture is stronger here than it looks
+### Critical Capture — why it was turned off
 
-`B_CRITICAL_CAPTURE TRUE` is a Gen 5 mechanic: catch odds are multiplied by
-0.5× / 1× / 1.5× / 2× / 2.5× depending on how much of the Pokédex you have
-**caught**, then divided by 6 and rolled. On success the ball shakes once and
-resolves immediately instead of three times. Below ~4.6% dex completion it never
-fires at all. The Catching Charm doubles the multiplier
-(`B_CATCHING_CHARM_BOOST 100`).
+Recorded because the reasoning is not obvious from the config comment.
 
-The wrinkle: `B_CRITICAL_CAPTURE_LOCAL_DEX TRUE` compares your **national** caught
-count against the **regional** dex total (`battle_script_commands.c:9976-9994`).
-With 1,029 species enabled but a Hoenn-sized regional total, the top 2.5× tier is
-reached at roughly 195 species caught — very early for this hack. So Critical
-Capture will be considerably more impactful than the Gen 5 pacing intends.
+It is a Gen 5 mechanic: catch odds are multiplied by 0.5× / 1× / 1.5× / 2× / 2.5×
+depending on how much of the Pokédex you have **caught**, then divided by 6 and
+rolled. On success the ball shakes once and resolves immediately. Below ~4.6% dex
+completion it never fires. The Catching Charm doubles the multiplier.
 
-Setting `B_CRITICAL_CAPTURE_LOCAL_DEX FALSE` scales it against the national count
-instead, which restores the intended curve without disabling the feature.
+Beyond simply post-dating Gen 3, it was badly scaled here:
+`B_CRITICAL_CAPTURE_LOCAL_DEX TRUE` compares your **national** caught count
+against the **regional** dex total (`battle_script_commands.c:9976-9994`). With
+1,029 species enabled against a Hoenn-sized total, the top 2.5× tier arrives at
+roughly 195 species caught — very early for this hack.
+
+If it is ever re-enabled, set `B_CRITICAL_CAPTURE_LOCAL_DEX FALSE` at the same
+time to restore the intended curve.
 
 ### Learnsets
 
