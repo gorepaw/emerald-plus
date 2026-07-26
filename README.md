@@ -1,10 +1,10 @@
-﻿# emerald+
+# emerald+
 
-Design notes, build setup and progress tracking for a PokÃ©mon Emerald romhack
+Design notes, build setup and progress tracking for a Pokémon Emerald romhack
 built on [pokeemerald-expansion](https://github.com/rh-hideout/pokeemerald-expansion)
 `expansion/1.16.2`, targeting the **Miyoo Mini Plus on stock firmware**.
 
-**This repository contains documentation only â€” no ROMs, no patches, no game
+**This repository contains documentation only — no ROMs, no patches, no game
 assets.** See [Legal](#legal) below.
 
 ## What the hack does
@@ -12,17 +12,17 @@ assets.** See [Legal](#legal) below.
 | | |
 |---|---|
 | **Species** | All 9 generations (1,029), DS-style art |
-| **Shiny rate** | 1/512 (â‰ˆ1/171 with the Shiny Charm) |
-| **IVs** | Every PokÃ©mon has perfect 31s â€” player, wild, gift, and enemy trainers |
-| **Battle style** | No physical/special split â€” damage class is by type, as in Gen 1â€“3 |
-| **EXP** | Gen 3 rules: split among participants, unscaled, none for catching, Gen 3â€“5 held-item Exp. Share |
-| **Kept from Gen 3** | Badge stat boosts, overworld poison damage, no affection mechanics |
-| **Movepools** | Gen 1â€“3 species use authentic RSE learnsets; later species use their debut generation's |
+| **Shiny rate** | 1/512 (≈1/171 with the Shiny Charm) |
+| **IVs** | Every Pokémon has perfect 31s — player, wild, gift, and enemy trainers |
+| **Battle style** | No physical/special split — damage class is by type, as in Gen 1–3 |
+| **EXP** | Gen 3 rules: split among participants, unscaled, 1.5× from trainers, none for catching, Gen 3–5 held-item Exp. Share |
+| **Kept from Gen 3** | Badge stat boosts, overworld poison damage, no affection mechanics, no Critical Capture |
+| **Movepools** | Gen 1–3 species use authentic RSE learnsets; later species use their debut generation's |
 | **Starters** | Kanto starter from Mr. Stone; Johto starter from Steven on Route 118 |
 | **Kanto** | All 417 FRLG maps compiled into the Emerald ROM, reachable postgame by ferry from Lilycove |
 | **Kanto gyms** | All 8 are double battles pairing each Kanto leader with their Johto counterpart |
 
-Johto as a walkable region is **cancelled** â€” its cast is delivered through the
+Johto as a walkable region is **cancelled** — its cast is delivered through the
 Kanto double-battle pairings instead, at a fraction of the cost.
 
 ## Documents
@@ -31,13 +31,13 @@ Kanto double-battle pairings instead, at a fraction of the cost.
 |---|---|
 | [PLAN.md](PLAN.md) | The project plan: measured resource constraints, features tiered by real cost, and the Kanto namespace-merge findings |
 | [SETUP.md](SETUP.md) | Toolchain, WSL2 environment, build and deploy steps |
-| [TODO.md](TODO.md) | Running task list â€” done, in progress, and parked ideas |
+| [TODO.md](TODO.md) | Running task list — done, in progress, and parked ideas |
 | [TESTING.md](TESTING.md) | mGBA debug-menu recipes, flag/map numbers for this build, and the current test checklist |
-| [QOL.md](QOL.md) | Survey of every QoL option the expansion already ships â€” what's on, what's off, and what's inert until you assign it a flag |
+| [QOL.md](QOL.md) | Survey of every QoL option the expansion already ships — what's on, what's off, and what's inert until you assign it a flag |
 
 ## Notable findings
 
-Things measured against the actual checkout rather than assumed â€” the parts most
+Things measured against the actual checkout rather than assumed — the parts most
 likely to be useful to someone else:
 
 - **ROM space is not the scarce resource.** At 26.5/32 MB the cartridge has ~6.7 MiB
@@ -66,7 +66,7 @@ or `git diff expansion/1.16.2` in a local checkout.
 
 ## Legal
 
-PokÃ©mon Emerald is copyright Nintendo / Game Freak / The PokÃ©mon Company. This
+Pokémon Emerald is copyright Nintendo / Game Freak / The Pokémon Company. This
 repository distributes no ROM, no patch and no game asset, and is not affiliated
 with or endorsed by any of them. Building the hack requires the pokeemerald-expansion
 decompilation and a legally obtained copy of the game.
