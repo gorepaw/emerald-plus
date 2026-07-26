@@ -14,6 +14,8 @@ assets.** See [Legal](#legal) below.
 | **Species** | All 9 generations (1,029), DS-style art |
 | **Shiny rate** | 1/512 (≈1/171 with the Shiny Charm) |
 | **IVs** | Every Pokémon has perfect 31s — player, wild, gift, and enemy trainers |
+| **Battle style** | No physical/special split — damage class is by type, as in Gen 1–3 |
+| **Movepools** | Gen 1–3 species use authentic RSE learnsets; later species use their debut generation's |
 | **Starters** | Kanto starter from Mr. Stone; Johto starter from Steven on Route 118 |
 | **Kanto** | All 417 FRLG maps compiled into the Emerald ROM, reachable postgame by ferry from Lilycove |
 | **Kanto gyms** | All 8 are double battles pairing each Kanto leader with their Johto counterpart |
@@ -29,6 +31,7 @@ Kanto double-battle pairings instead, at a fraction of the cost.
 | [SETUP.md](SETUP.md) | Toolchain, WSL2 environment, build and deploy steps |
 | [TODO.md](TODO.md) | Running task list — done, in progress, and parked ideas |
 | [TESTING.md](TESTING.md) | mGBA debug-menu recipes, flag/map numbers for this build, and the current test checklist |
+| [QOL.md](QOL.md) | Survey of every QoL option the expansion already ships — what's on, what's off, and what's inert until you assign it a flag |
 
 ## Notable findings
 
