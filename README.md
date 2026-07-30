@@ -18,6 +18,9 @@ assets.** See [Legal](#legal) below.
 | **EXP** | Gen 3 rules: split among participants, unscaled, 1.5× from trainers, none for catching, Gen 3–5 held-item Exp. Share |
 | **Kept from Gen 3** | Badge stat boosts, overworld poison damage, no affection mechanics, no Critical Capture |
 | **Movepools** | Gen 1–3 species use authentic RSE learnsets; later species use their debut generation's |
+| **Encounters** | Gen 1–2 species seeded into early Hoenn at low rates; Hoenn dex extended to 239 entries |
+| **Pseudo-legendaries** | All four lines reachable pre-Elite Four — Beldum, Bagon, Dratini and Larvitar |
+| **Trainers** | Minimum party sizes enforced (2 / 3 in gyms / 4–6 for leaders), and no trainer below its route's wild level |
 | **Starters** | Kanto starter from Mr. Stone; Johto starter from Steven on Route 118 |
 | **Kanto** | All 417 FRLG maps compiled into the Emerald ROM, reachable postgame by ferry from Lilycove |
 | **Kanto gyms** | All 8 are double battles pairing each Kanto leader with their Johto counterpart, awarding Kanto's own eight badges |
@@ -34,6 +37,7 @@ Kanto double-battle pairings instead, at a fraction of the cost.
 | [TODO.md](TODO.md) | Running task list — done, in progress, and parked ideas |
 | [TESTING.md](TESTING.md) | mGBA debug-menu recipes, flag/map numbers for this build, and the current test checklist |
 | [QOL.md](QOL.md) | Survey of every QoL option the expansion already ships — what's on, what's off, and what's inert until you assign it a flag |
+| [BALANCE.md](BALANCE.md) | Encounter and trainer-party rules, the slot-rate tables, and how far through Hoenn they've been applied |
 
 ## Notable findings
 
@@ -61,7 +65,7 @@ branched from tag `expansion/1.16.2`:
 
 Every commit hash referenced in these documents resolves there. The full delta from
 upstream is
-[25 commits](https://github.com/rh-hideout/pokeemerald-expansion/compare/expansion/1.16.2...gorepaw:pokeemerald-expansion:emerald-plus),
+[31 commits](https://github.com/rh-hideout/pokeemerald-expansion/compare/expansion/1.16.2...gorepaw:pokeemerald-expansion:emerald-plus),
 or `git diff expansion/1.16.2` in a local checkout.
 
 ## Legal

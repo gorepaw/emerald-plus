@@ -224,6 +224,17 @@ Both are **public**; pushes authenticate silently, so treat `git push` as
 publishing. After engine commits, bump the "N commits" compare link in the
 README so it stays honest.
 
+## Don't let PowerShell write text files in these repos
+
+`Set-Content -Encoding utf8` round-tripped README.md through a bad encoding once,
+turning every em-dash and é into mojibake and prepending a BOM. Use the Read/Edit
+tools for file content, or a heredoc inside WSL. PowerShell is fine for running
+git and copying binaries — not for authoring text.
+
+For multi-line git commit messages, write a `.sh` to the scratchpad with a
+quoted heredoc and run it through WSL. That also dodges PowerShell's parser
+mangling `$`, quotes and parentheses.
+
 ## File-format traps
 
 - **`.party` files have no comment syntax.** `@` is the held-item separator

@@ -2,13 +2,30 @@
 
 ## ▶ RESUME HERE
 
-**State as of 2026-07-26:** engine fork at `271d00bdf9`, **16 commits** since
-`expansion/1.16.2`, both repos pushed and clean. ROM 84.81%, SaveBlock1
-15,744/15,872 (128 free). Kanto is walkable postgame via the Lilycove ferry,
-all 8 gyms are Kanto+Johto double battles, and Kanto doors now animate.
+**State as of 2026-07-29:** engine fork at `e72d3def85`, **30 commits** since
+`expansion/1.16.2`. ROM 84.79%. `FLAGS_COUNT` unchanged throughout, so existing
+saves stay valid — but the egg/tutor relearner flags are set in `NewGameInitData`
+and therefore **only exist on a new game**.
 
-**Next task: the Elite Four + Champion.** Same restructure as the gyms — see
-"Kanto postgame" below and PLAN.md for the pairing table.
+Kanto is walkable postgame with its own eight badge flags, all 8 Kanto gyms are
+Kanto+Johto double battles, doors animate, and the ruleset is settled — read
+**QOL.md** for every config decision and **BALANCE.md** for the encounter and
+trainer-party rules plus how far through Hoenn they've been applied.
+
+## ▶ Two tracks are live. Pick one.
+
+**Track A — walk Hoenn from the start, route by route** *(what we were doing)*
+
+The loop is: I report a route's encounters and trainers, you say what to add, I
+apply it along with the standing party rules. **BALANCE.md has the rules, the
+tooling, and the signed-off table.** Done through Dewford Gym; next is
+**Routes 107–109 → Slateport**, then Route 110 → Mauville where **Wattson goes
+4→6** and the six-Pokémon leader rule starts to bite.
+
+⚠️ Scope "retroactive" to the routes already covered. It does **not** mean all
+1,491 trainers across both regions — that was a misread once already.
+
+**Track B — the Kanto Elite Four + Champion** *(the last big structural piece)*
 
 | Slot | Kanto | Johto |
 |---|---|---|
@@ -28,7 +45,24 @@ or map-script triggers rather than a plain `trainerbattle_single`, and the
 champion sequence has a long post-battle cutscene. **Survey the scripts first**,
 as was done for the gyms; do not assume the gym pattern transfers unchanged.
 
-Also still unplayed: 7 of the 8 gyms (only Pewter has been tested in-game).
+⚠️ **`PokemonLeague_HallOfFame_Frlg/scripts.inc` sets `FLAG_POKE_RIDER`**
+(Fly-from-region-map). It lives there rather than in the Champion's Room
+precisely so this conversion can't disturb it — **don't drop it.**
+
+Do these two at the same time:
+- **Kanto leaders + E4 into the rematch table.** 78 of `MAX_REMATCH_ENTRIES`
+  (100) used and `SaveBlock1` already carries `u8 trainerRematches[100]`, so
+  **22 free save-safe slots** — enough for 8 leaders + 4 E4 + champion = 13.
+  Past 100 is save-breaking. Match Call, not Vs. Seeker; reasoning in QOL.md.
+- Apply the party rules to the Kanto E4 while the files are open.
+
+### Untested, and only a playthrough can settle it
+
+- **7 of 8 Kanto gyms** have never been played (only Pewter).
+- **The Kanto Hall of Fame has never run.** It uses FRLG's
+  `FLDEFF_HALL_OF_FAME_RECORD_FRLG` and `special EnterHallOfFame`; both symbols
+  link, but that sequence has never executed in an Emerald build.
+- None of the early-Hoenn content added since 2026-07-27 has been played.
 
 ---
 
