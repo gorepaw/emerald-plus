@@ -102,12 +102,34 @@ map it stands on.
 | Route 106 | — | Kyla +1, Ned +1 |
 | Dewford Gym | — | 6 trainers 1→3 each, **Brawly 3→5** |
 | Granite Cave B2F | Onix 9%, **Beldum 1%** | — |
-| Meteor Falls ×4 | **Dratini** Good Rod 20%, L15–25 | — |
+| Meteor Falls ×4 | **Dratini** Good Rod 20% L15–25, Super Rod 15%; **Dragonair** Super Rod 1% L25–35 | — |
 | Jagged Pass | **Larvitar 1%** L20 | — |
 | Victory Road B1F/B2F | **Pupitar 1%** L42 / L44 | — |
+| Route 107 | *deferred* | Tony +Wailmer, Beth +Wingull, Camron +Goldeen |
+| Route 108 | *deferred* | Jerome +Wailmer, Matthew +Tentacool, Missy +Horsea |
+| Route 109 | *deferred* | Austina +Goldeen, Gwen +Wingull, Edmond +Machop, Ricky +Marill, Hailey +Azurill |
+| Seashore House | — | Johanna +Marill |
 
-**Next up:** Routes 107–109 → Slateport City, then Route 110 → Mauville, where
-**Wattson goes 4→6** and the six-Pokémon leader rule starts biting.
+**Next up:** Route 110 → Mauville City, where **Wattson goes 4→6** and the
+six-Pokémon leader rule starts biting.
+
+### Deferred, deliberately
+
+- **The Slateport approach's water and rod tables.** Route 107, Route 108,
+  Route 109 and Slateport City share **one identical table** — Tentacool 60 /
+  Wingull 35 / Pelipper 5 on the surface, and a Super Rod that is five slots of
+  Wailmer. Editing them one route at a time would mean writing the same patch
+  four times, so all the region's water goes in one pass later. Their *parties*
+  are done.
+- **Rematch parties.** Trainers with Match Call rematches (`_2` … `_5`) have
+  never been touched — `RICKY_1` now has two Pokémon while `RICKY_2` still has
+  one Linoone. Every signed-off route has this. One sweep, once the rules stop
+  moving.
+
+⚠️ Most of this stretch is **Surf-gated**: only Route 109's beach and the
+Seashore House are reachable when the ferry drops you off, which is why their
+trainers sit at L11–13 while Routes 107, 108 and Route 109's water are L24–27.
+The Abandoned Ship on Route 108 needs Dive and is a much later stop.
 
 ### Pseudo-legendary availability
 
@@ -117,11 +139,17 @@ Deliberately opened up early. All four lines reachable pre-Elite Four:
 |---|---|---|
 | Beldum → Metagross | Granite Cave B2F | 1% |
 | Bagon → Salamence | Meteor Falls B1F_2R | 25% (vanilla) |
-| Dratini → Dragonite | Meteor Falls, Good Rod | 20% |
+| Dratini → Dragonite | Meteor Falls, Good Rod / Super Rod | 20% / 15% |
 | Larvitar → Tyranitar | Jagged Pass (Larvitar), Victory Road B1F/B2F (Pupitar) | 1% |
 
 Beldum and Dratini were normally post-game only. Pupitar at L42–44 is still well
 short of its **L55** Tyranitar evolution.
+
+Meteor Falls copies the shape FRLG's Safari Zone already uses for this line:
+Dratini on the Super Rod's 15% slot and **Dragonair on its 1% slot**, in all four
+fishing rooms. Dratini itself stays likelier on the Good Rod (20% vs 15%) because
+the Super Rod's rates are 40/40/15/4/1 and there is nothing between 15 and 40 —
+what the better rod buys you is the evolved form, which no other rod can produce.
 
 ---
 
