@@ -2,8 +2,8 @@
 
 ## ▶ RESUME HERE
 
-**State as of 2026-07-30:** engine fork at `40 commits` since
-`expansion/1.16.2`. ROM 84.83%, deployed ROM MD5 `d9ac1153c068fad6720e2b03871a6740`.
+**State as of 2026-07-30:** engine fork at **43 commits** since
+`expansion/1.16.2`. ROM 84.90%, deployed ROM MD5 `0fc2afd3caa516a10b40ae02026c415b`.
 `FLAGS_COUNT` unchanged throughout and EWRAM held at 226,760 B, so existing saves
 stay valid — but the egg/tutor relearner flags are set in `NewGameInitData` and
 therefore **only exist on a new game**.
@@ -25,9 +25,21 @@ trainer-party rules.
 - **Linking Cord sold at the Battle Frontier for 1 BP**, which is what makes
   Gengar, Alakazam, Machamp and Golem obtainable without a second console.
 
-Guard rails: `party_audit.py` must stay at 0/0 and `availability.py` at 373/386.
+**Kanto content is complete too**, same day:
 
-**Track A — the 13 legendary and event families** *(the deliberate gap)*
+- **Kanto had no wild Pokémon at all** — 264 tables compiled out behind
+  `#ifdef FIRERED` / `#ifdef LEAFGREEN`. Fixed; FireRed is canonical Kanto.
+- **Wilds and trainers scaled to L55–75**, with 1,384 wild entries and 677
+  trainer Pokémon evolved to match their new levels.
+- **Gen 4–9 at 545/639**, 284 families placed by type affinity.
+- **Gym leaders at 3 each**, on their Johto partner's exact levels — the side is
+  3 + 3, not the 8-vs-6 Giovanni and Clair used to bring.
+
+Guard rails: `party_audit.py` at 0/0, `availability.py` at 373/386 and 545/639.
+
+**Track A — the legendaries** *(the deliberate gap)*
+
+13 Gen 1–2 families and 90 Gen 4–9 legendary/paradox families.
 
 Articuno, Zapdos, Moltres, Mewtwo, Mew, Raikou, Entei, Suicune, Lugia, Ho-Oh,
 Celebi, Jirachi, Deoxys. Skipped on purpose — none belongs in a normal encounter
@@ -58,12 +70,14 @@ as was done for the gyms; do not assume the gym pattern transfers unchanged.
 (Fly-from-region-map). It lives there rather than in the Champion's Room
 precisely so this conversion can't disturb it — **don't drop it.**
 
-Do these two at the same time:
+Do these at the same time:
 - **Kanto leaders + E4 into the rematch table.** 78 of `MAX_REMATCH_ENTRIES`
   (100) used and `SaveBlock1` already carries `u8 trainerRematches[100]`, so
   **22 free save-safe slots** — enough for 8 leaders + 4 E4 + champion = 13.
   Past 100 is save-breaking. Match Call, not Vs. Seeker; reasoning in QOL.md.
-- Apply the party rules to the Kanto E4 while the files are open.
+- **Split each E4 member 6 → 3+3** with their Johto partner. Their parties are
+  already sized to 6 and levelled for exactly this, so the conversion is a
+  split, not a rebalance. Blue has three starter variants plus rematches.
 
 Kanto also has **none** of the content work Hoenn just got — no encounter
 placement, no party rules. `party_audit.py` scopes to Hoenn on purpose.

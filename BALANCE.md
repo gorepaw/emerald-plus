@@ -17,7 +17,7 @@ python3 tools/emerald_plus/encounter_report.py --raw MAP_ROUTE102
 # every trainer in Hoenn against the rules below; --list names the misses
 python3 tools/emerald_plus/party_audit.py
 
-# which Gen 1-3 families Hoenn can actually produce
+# Gen 1-3 in Hoenn, and Gen 4-9 across both regions
 python3 tools/emerald_plus/availability.py
 
 # one line per table for the whole region, flagging one-species tables
@@ -25,9 +25,16 @@ python3 tools/emerald_plus/table_survey.py land_mons
 ```
 
 `party_audit.py` and `availability.py` are the regression guards. The audit
-exits non-zero if anything is short; availability should read **373/386** with
-only the 13 legendary and event families outstanding. If either moves, a table
-or a party moved with it.
+exits non-zero if anything is short; availability should read **373/386** for
+Gen 1–3 in Hoenn and **545/639** for Gen 4–9, with only legendary families
+outstanding on both counts. If any of those move, a table or a party moved.
+
+⚠️ **The species enum is not national dex order past ~1008.** It interleaves
+regional forms (Samurott-Hisui at 1000), the cosmetic Pikachu caps (1009–1023)
+and the Unown letters, while real Gen 8–9 species sit far higher — Pecharunt is
+**1434**. Reading a generation off the enum value places Pikachu hats and misses
+Hydrapple. Derive generations from the national dex list. For 1–386 the two
+agree, which is why this went unnoticed through the whole Hoenn pass.
 
 ---
 
@@ -211,11 +218,88 @@ pass, which confirms it.
 
 ---
 
+---
+
+## Kanto
+
+⚠️ **Kanto had no wild Pokémon at all until 2026-07-30.** The generator picks a
+version guard off the base_label — `FireRed` in the label meant `#ifdef FIRERED`
+— and our build defines `EMERALD` and neither of the others, so all 132 FireRed
+tables and all 132 LeafGreen tables compiled out. Every route, every cave, every
+island produced nothing. That was the **eighth** instance of the version-gated
+FRLG data class, after tilesets, trainer tables, map scripts, object graphics,
+palettes, doors and encounters.
+
+The fix renames the labels `_FireRed` → `_Kanto`, so they fall through to
+`EMERALD` with no change to the generator. **FireRed is canonical Kanto and the
+LeafGreen copies are deleted** — a second copy means every edit has to be made
+twice.
+
+### Level curve
+
+Kanto is postgame; you arrive by ferry after Wallace at roughly L55–58. Levels
+are remapped onto **L55–75**, preserving Kanto's internal ordering:
+
+```
+new = 55 + (old - 2) * 20 / 65,  clamped to [55, 75]
+```
+
+Species follow the levels. Plain `EVO_LEVEL` evolutions apply where the slot's
+**minimum** level clears the threshold, so every instance is genuinely past it.
+Stone, trade and friendship evolutions are left alone — which is why Pikachu
+stays Pikachu and Eevee stays Eevee, and their base forms stay catchable.
+
+1,384 wild entries and 677 trainer Pokémon evolved under that rule.
+
+### Gen 4–9
+
+**545 of 639 reachable**, the remaining 94 all legendary or paradox. 284
+families had no member obtainable anywhere; each now has exactly one Kanto slot.
+
+Placement is by **type affinity** — each table gets a type profile from what's
+already on it, each family the types of the form being placed, and the greedy
+assignment scores overlap as a *fraction* of the table. A raw count lets 12-slot
+land tables outscore every 5-slot water table on size alone.
+
+**Clone rooms are split rather than left identical.** Half of Kanto was the same
+table repeated — Lost Cave ×10, Tanoby Ruins ×7, S.S. Anne water ×15 — and
+differentiating them is what holds the density to 172 tables with one newcomer,
+53 with two, 2 with three.
+
+### Double battles: 3 + 3
+
+`B_MULTI_HALF_TEAMS` is **FALSE** and no leader carries `Multi Party: Half`, so
+in a two-trainer battle **both trainers bring their full party**. Giovanni's five
+plus Clair's three was eight Pokémon against your six.
+
+| Who | Party |
+|---|---|
+| Kanto gym leader | **exactly 3**, at their Johto partner's exact levels |
+| Johto partner | 3 |
+| Elite Four, Blue | **6** — their rooms are still single battles; becomes 3+3 when the partner lands |
+| Trainer in a gym | ≥ 3 |
+| Everyone else | ≥ 2 |
+
+⚠️ **The minimum is a floor, not a target.** Treating ≥2 as an exact size
+stripped 398 Pokémon out of Kanto before the diff was read. Only leaders and the
+Elite Four have an exact size; everyone else only ever grows.
+
+### The Kanto dex is inert
+
+`REGIONAL_DEX_COUNT` is `IS_FRLG ? KANTO_DEX_COUNT : HOENN_DEX_COUNT`, and
+`IS_FRLG` is 0 in an Emerald build. `FOREACH_SPECIES_IN_KANTO_DEX_ORDER` is dead
+code here. Gen 4–9 species show up in the **national** dex, which is unlocked
+before Kanto is reachable, so no dex work was needed.
+
+---
+
 ## Still open
 
-- **The 13 legendary and event families.** Wild tables are the wrong home; they
-  want one-time statics with a flag each, at designed locations.
-- **Kanto.** None of these rules has been applied to the 419 `_Frlg` maps —
-  neither encounters nor parties. `party_audit.py` scopes to Hoenn deliberately.
+- **The legendaries.** 13 Gen 1–2 families and 90 Gen 4–9 legendary/paradox
+  families. Wild tables are the wrong home; they want one-time statics with a
+  flag each, at designed locations.
+- **The Kanto Elite Four double battles.** The gyms are converted; the E4 rooms
+  are still single battles. Their party sizes are already set so the conversion
+  is a straight 6 → 3+3 split.
 - **The Battle Frontier's own facilities.** Battle Pike, Battle Pyramid and
   Trainer Hill carry their own tables and are untouched.
