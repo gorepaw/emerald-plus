@@ -2,8 +2,8 @@
 
 ## ▶ RESUME HERE
 
-**State as of 2026-07-30:** engine fork at **45 commits** since
-`expansion/1.16.2`. ROM 84.90%, deployed ROM MD5 `88ce4208841d1e33266b591eba3a6b47`.
+**State as of 2026-07-30:** engine fork at **46 commits** since
+`expansion/1.16.2`. ROM 84.90%, deployed ROM MD5 `6cf7d0c6b2f45a3ff352891fe3dfd5e5`.
 `FLAGS_COUNT` unchanged throughout and EWRAM held at 226,760 B, so existing saves
 stay valid — but the egg/tutor relearner flags are set in `NewGameInitData` and
 therefore **only exist on a new game**.
@@ -48,20 +48,28 @@ Celebi, Jirachi, Deoxys. Skipped on purpose — none belongs in a normal encount
 table. They want one-time static encounters: a designed location each, its own
 flag so it can't repeat, and encounter music. Roughly 13 new map scripts.
 
-**Track B — Kanto leaders + E4 into the rematch table** *(what's left of it)*
+**Track B — make Kanto's gym leaders actually re-fightable** *(what's left)*
 
 The double-battle conversion is **done** — all 8 gyms and all 5 league rooms.
-What remains is Match Call rematches: 78 of `MAX_REMATCH_ENTRIES` (100) used and
-`SaveBlock1` already carries `u8 trainerRematches[100]`, so **22 free save-safe
-slots** — enough for 8 leaders + 4 E4 + champion = 13. Past 100 is
-save-breaking. Match Call, not Vs. Seeker; reasoning in QOL.md.
+The rematch table is **done** — 90 of 100 entries, Kanto's leaders correctly
+placed above `REMATCH_SIDNEY` so they aren't mistaken for Elite Four. The Johto
+half of a league rematch now **scales** with its Kanto counterpart.
+
+What's left is the in-gym rematch branch. Two blockers, both in BALANCE.md:
+
+- `ShouldTryRematchBattle` reads `opponentA`, which Kanto's gyms never populate
+  because they guard on `FLAG_DEFEATED_*` before the battle command. Needs a
+  script-visible special that takes a trainer id from a var.
+- There's no two-trainer `trainerbattle_rematch_double`, so a plain rematch
+  branch would never advance `trainerRematches[]`.
+
+Until that's built, Kanto's leaders are deliberately **out** of
+`GymLeaderRematches_AfterNewMauville` — better no offer than an offer that
+leads to a fight the scripts can't start.
 
 ⚠️ **`PokemonLeague_HallOfFame_Frlg/scripts.inc` sets `FLAG_POKE_RIDER`**
 (Fly-from-region-map). It lives there rather than in the Champion's Room so
 league work can't disturb it — **don't drop it.**
-
-Also open: an Elite Four **rematch** reuses the same Johto partner as the first
-fight, so the Kanto half scales and the Johto half doesn't.
 
 ### Untested, and only a playthrough can settle it
 
