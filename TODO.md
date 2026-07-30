@@ -2,8 +2,8 @@
 
 ## ▶ RESUME HERE
 
-**State as of 2026-07-30:** engine fork at **43 commits** since
-`expansion/1.16.2`. ROM 84.90%, deployed ROM MD5 `0fc2afd3caa516a10b40ae02026c415b`.
+**State as of 2026-07-30:** engine fork at **45 commits** since
+`expansion/1.16.2`. ROM 84.90%, deployed ROM MD5 `88ce4208841d1e33266b591eba3a6b47`.
 `FLAGS_COUNT` unchanged throughout and EWRAM held at 226,760 B, so existing saves
 stay valid — but the egg/tutor relearner flags are set in `NewGameInitData` and
 therefore **only exist on a new game**.
@@ -29,11 +29,13 @@ trainer-party rules.
 
 - **Kanto had no wild Pokémon at all** — 264 tables compiled out behind
   `#ifdef FIRERED` / `#ifdef LEAFGREEN`. Fixed; FireRed is canonical Kanto.
-- **Wilds and trainers scaled to L55–75**, with 1,384 wild entries and 677
-  trainer Pokémon evolved to match their new levels.
+- **Two level bands: wilds L50–89, every trainer L60–98**, with 1,384 wild
+  entries and 677 trainer Pokémon evolved to match.
 - **Gen 4–9 at 545/639**, 284 families placed by type affinity.
-- **Gym leaders at 3 each**, on their Johto partner's exact levels — the side is
-  3 + 3, not the 8-vs-6 Giovanni and Clair used to bring.
+- **All 8 gyms and all 5 league rooms are double battles**, 3 + 3 per side —
+  not the 8-vs-6 Giovanni and Clair used to bring. Koga needed a second entry,
+  `TRAINER_JOHTO_KOGA`, because he is both a Kanto gym leader and a Johto
+  Elite Four member.
 
 Guard rails: `party_audit.py` at 0/0, `availability.py` at 373/386 and 545/639.
 
@@ -46,41 +48,20 @@ Celebi, Jirachi, Deoxys. Skipped on purpose — none belongs in a normal encount
 table. They want one-time static encounters: a designed location each, its own
 flag so it can't repeat, and encounter music. Roughly 13 new map scripts.
 
-**Track B — the Kanto Elite Four + Champion** *(the last big structural piece)*
+**Track B — Kanto leaders + E4 into the rematch table** *(what's left of it)*
 
-| Slot | Kanto | Johto |
-|---|---|---|
-| E4 1 | Lorelei | Will |
-| E4 2 | Bruno | Karen |
-| E4 3 | Agatha | Koga |
-| E4 4 | Lance | Chuck |
-| Champion | Blue | **Red** |
-
-All five Johto-side trainers already exist (`TRAINER_JOHTO_WILL`, `_KAREN`,
-`_KOGA`… wait — Koga is a *Kanto* leader trainer, `TRAINER_LEADER_KOGA`, reused
-here; that is canonical, he was promoted to the Johto E4 in GSC) plus
-`TRAINER_JOHTO_CHUCK` and `TRAINER_JOHTO_RED`. Red already has a real sprite.
-
-⚠️ E4 rooms differ from gyms — they likely use `trainerbattle_continue_script`
-or map-script triggers rather than a plain `trainerbattle_single`, and the
-champion sequence has a long post-battle cutscene. **Survey the scripts first**,
-as was done for the gyms; do not assume the gym pattern transfers unchanged.
+The double-battle conversion is **done** — all 8 gyms and all 5 league rooms.
+What remains is Match Call rematches: 78 of `MAX_REMATCH_ENTRIES` (100) used and
+`SaveBlock1` already carries `u8 trainerRematches[100]`, so **22 free save-safe
+slots** — enough for 8 leaders + 4 E4 + champion = 13. Past 100 is
+save-breaking. Match Call, not Vs. Seeker; reasoning in QOL.md.
 
 ⚠️ **`PokemonLeague_HallOfFame_Frlg/scripts.inc` sets `FLAG_POKE_RIDER`**
-(Fly-from-region-map). It lives there rather than in the Champion's Room
-precisely so this conversion can't disturb it — **don't drop it.**
+(Fly-from-region-map). It lives there rather than in the Champion's Room so
+league work can't disturb it — **don't drop it.**
 
-Do these at the same time:
-- **Kanto leaders + E4 into the rematch table.** 78 of `MAX_REMATCH_ENTRIES`
-  (100) used and `SaveBlock1` already carries `u8 trainerRematches[100]`, so
-  **22 free save-safe slots** — enough for 8 leaders + 4 E4 + champion = 13.
-  Past 100 is save-breaking. Match Call, not Vs. Seeker; reasoning in QOL.md.
-- **Split each E4 member 6 → 3+3** with their Johto partner. Their parties are
-  already sized to 6 and levelled for exactly this, so the conversion is a
-  split, not a rebalance. Blue has three starter variants plus rematches.
-
-Kanto also has **none** of the content work Hoenn just got — no encounter
-placement, no party rules. `party_audit.py` scopes to Hoenn on purpose.
+Also open: an Elite Four **rematch** reuses the same Johto partner as the first
+fight, so the Kanto half scales and the Johto half doesn't.
 
 ### Untested, and only a playthrough can settle it
 

@@ -235,14 +235,18 @@ The fix renames the labels `_FireRed` → `_Kanto`, so they fall through to
 LeafGreen copies are deleted** — a second copy means every edit has to be made
 twice.
 
-### Level curve
+### Level bands
 
-Kanto is postgame; you arrive by ferry after Wallace at roughly L55–58. Levels
-are remapped onto **L55–75**, preserving Kanto's internal ordering:
+Kanto is postgame — you arrive by ferry after Wallace. **Two bands, with the
+trainers a clear tier above the grass:**
 
-```
-new = 55 + (old - 2) * 20 / 65,  clamped to [55, 75]
-```
+| | Band |
+|---|---|
+| Wild encounters | **L50–89** |
+| Every Kanto trainer | **L60–98** |
+
+That's *all* 1,704 Kanto trainer Pokémon across 624 entries, not just the gym
+pairs — verified as 0 below 60 and 0 above 98. Red closes the region at L98.
 
 Species follow the levels. Plain `EVO_LEVEL` evolutions apply where the slot's
 **minimum** level clears the threshold, so every instance is genuinely past it.
@@ -250,6 +254,13 @@ Stone, trade and friendship evolutions are left alone — which is why Pikachu
 stays Pikachu and Eevee stays Eevee, and their base forms stay catchable.
 
 1,384 wild entries and 677 trainer Pokémon evolved under that rule.
+
+⚠️ **A band that moves down needs a backward walk too.** Evolving species up to
+suit one floor strands them if the floor later drops — a Tyranitar at L50 is
+something the player could never legitimately have caught, since it evolves at
+55. The settle step walks forward while the level allows *and back while it does
+not*, and asserts afterwards that no wild species sits below its own evolution
+threshold.
 
 ### Gen 4–9
 
@@ -275,10 +286,29 @@ plus Clair's three was eight Pokémon against your six.
 | Who | Party |
 |---|---|
 | Kanto gym leader | **exactly 3**, at their Johto partner's exact levels |
-| Johto partner | 3 |
-| Elite Four, Blue | **6** — their rooms are still single battles; becomes 3+3 when the partner lands |
+| Kanto Elite Four, Blue | **exactly 3**, likewise |
+| Johto partner | 3, inheriting the Kanto half's levels |
 | Trainer in a gym | ≥ 3 |
 | Everyone else | ≥ 2 |
+
+**All 8 gyms and all 5 league rooms are double battles.** The pairings:
+
+| Room | Kanto | Johto |
+|---|---|---|
+| E4 1 | Lorelei | Will |
+| E4 2 | Bruno | Karen |
+| E4 3 | Agatha | **Koga** |
+| E4 4 | Lance | Chuck |
+| Champion | Blue | **Red** |
+
+⚠️ **Koga is on both sides of the pairing table** — Fuchsia's gym leader in
+Kanto, promoted to the Johto Elite Four in GSC. One trainer entry means one
+party at one level, so he needs two: `TRAINER_LEADER_KOGA` for the gym and
+`TRAINER_JOHTO_KOGA` for the league.
+
+Adding a trainer is **save-safe**: `TRAINER_FLAGS_END` is sized by
+`MAX_TRAINERS_COUNT` (1536), not by how many trainers exist. 1,491 are in use,
+so there are ~45 spare IDs before that ceiling has to move.
 
 ⚠️ **The minimum is a floor, not a target.** Treating ≥2 as an exact size
 stripped 398 Pokémon out of Kanto before the diff was read. Only leaders and the
@@ -298,8 +328,8 @@ before Kanto is reachable, so no dex work was needed.
 - **The legendaries.** 13 Gen 1–2 families and 90 Gen 4–9 legendary/paradox
   families. Wild tables are the wrong home; they want one-time statics with a
   flag each, at designed locations.
-- **The Kanto Elite Four double battles.** The gyms are converted; the E4 rooms
-  are still single battles. Their party sizes are already set so the conversion
-  is a straight 6 → 3+3 split.
 - **The Battle Frontier's own facilities.** Battle Pike, Battle Pyramid and
   Trainer Hill carry their own tables and are untouched.
+- **Johto rematch partners.** An Elite Four rematch reuses the same Johto
+  partner as the first fight, so the Kanto half scales on a rematch and the
+  Johto half does not.
