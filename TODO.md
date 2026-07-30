@@ -2,34 +2,37 @@
 
 ## ▶ RESUME HERE
 
-**State as of 2026-07-29:** engine fork at `a70d0e5d10`, **34 commits** since
-`expansion/1.16.2`. ROM 84.79%, deployed ROM MD5 `092cd6e308b3ba28a69aaf86a0801ba4`.
-`FLAGS_COUNT` unchanged throughout, so existing saves stay valid — but the
-egg/tutor relearner flags are set in `NewGameInitData` and therefore **only exist
-on a new game**.
+**State as of 2026-07-30:** engine fork at `40 commits` since
+`expansion/1.16.2`. ROM 84.83%, deployed ROM MD5 `d9ac1153c068fad6720e2b03871a6740`.
+`FLAGS_COUNT` unchanged throughout and EWRAM held at 226,760 B, so existing saves
+stay valid — but the egg/tutor relearner flags are set in `NewGameInitData` and
+therefore **only exist on a new game**.
 
 Kanto is walkable postgame with its own eight badge flags, all 8 Kanto gyms are
 Kanto+Johto double battles, doors animate, and the ruleset is settled — read
 **QOL.md** for every config decision and **BALANCE.md** for the encounter and
-trainer-party rules plus how far through Hoenn they've been applied.
+trainer-party rules.
 
-## ▶ Two tracks are live. Pick one.
+## ▶ Hoenn is done. Two things are left.
 
-**Track A — walk Hoenn from the start, route by route** *(what we were doing)*
+**Hoenn content is complete**, in one autonomous pass on 2026-07-30:
 
-The loop is: I report a route's encounters and trainers, you say what to add, I
-apply it along with the standing party rules. **BALANCE.md has the rules, the
-tooling, and the signed-off table.** Done through the Slateport approach; next is
-**Route 110 → Mauville**, where **Wattson goes 4→6** and the six-Pokémon leader
-rule starts to bite.
+- **373 of 386 Gen 1–3 species reachable**, up from 268. 55 evolutionary
+  families placed in 82 slots across 57 maps.
+- **Hoenn dex 239 → 387 entries.**
+- **818 trainers audited, 0 short and 0 under the level floor** — 290 Pokémon
+  added and 51 levels raised, rematch parties included.
+- **Linking Cord sold at the Battle Frontier for 1 BP**, which is what makes
+  Gengar, Alakazam, Machamp and Golem obtainable without a second console.
 
-⚠️ Scope "retroactive" to the routes already covered. It does **not** mean all
-1,491 trainers across both regions — that was a misread once already.
+Guard rails: `party_audit.py` must stay at 0/0 and `availability.py` at 373/386.
 
-Two things this track has consciously postponed, both recorded in BALANCE.md:
-**all the water and rod tables in one pass** (four maps around Slateport share a
-single table, so route-by-route editing would mean writing the same patch four
-times), and **the rematch parties** (`_2` … `_5`), which no route has touched.
+**Track A — the 13 legendary and event families** *(the deliberate gap)*
+
+Articuno, Zapdos, Moltres, Mewtwo, Mew, Raikou, Entei, Suicune, Lugia, Ho-Oh,
+Celebi, Jirachi, Deoxys. Skipped on purpose — none belongs in a normal encounter
+table. They want one-time static encounters: a designed location each, its own
+flag so it can't repeat, and encounter music. Roughly 13 new map scripts.
 
 **Track B — the Kanto Elite Four + Champion** *(the last big structural piece)*
 
@@ -62,13 +65,21 @@ Do these two at the same time:
   Past 100 is save-breaking. Match Call, not Vs. Seeker; reasoning in QOL.md.
 - Apply the party rules to the Kanto E4 while the files are open.
 
+Kanto also has **none** of the content work Hoenn just got — no encounter
+placement, no party rules. `party_audit.py` scopes to Hoenn on purpose.
+
 ### Untested, and only a playthrough can settle it
 
 - **7 of 8 Kanto gyms** have never been played (only Pewter).
 - **The Kanto Hall of Fame has never run.** It uses FRLG's
   `FLDEFF_HALL_OF_FAME_RECORD_FRLG` and `special EnterHallOfFame`; both symbols
   link, but that sequence has never executed in an Emerald build.
-- None of the early-Hoenn content added since 2026-07-27 has been played.
+- **None of the Hoenn content has been played** — not the early routes added
+  from 2026-07-27, and not one of the 82 new encounter slots, 290 added trainer
+  Pokémon or 148 dex entries from the 2026-07-30 pass. The audits prove the
+  rules hold; they say nothing about whether it's *fun*.
+- **The Battle Frontier's Linking Cord** has never been bought. The vendor menu
+  needs four separate lists to agree, and only the game can confirm they do.
 
 ---
 

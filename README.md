@@ -18,9 +18,11 @@ assets.** See [Legal](#legal) below.
 | **EXP** | Gen 3 rules: split among participants, unscaled, 1.5× from trainers, none for catching, Gen 3–5 held-item Exp. Share |
 | **Kept from Gen 3** | Badge stat boosts, overworld poison damage, no affection mechanics, no Critical Capture |
 | **Movepools** | Gen 1–3 species use authentic RSE learnsets; later species use their debut generation's |
-| **Encounters** | Gen 1–2 species seeded into early Hoenn at low rates; Hoenn dex extended to 239 entries |
+| **Encounters** | **373 of 386 Gen 1–3 species catchable in Hoenn**, up from 268 — 55 evolutionary families given a home. Only the Gen 1–2 legendaries are missing |
+| **Pokédex** | Hoenn dex extended to 387 entries; every species catchable in Hoenn is listed in it |
 | **Pseudo-legendaries** | All four lines reachable pre-Elite Four — Beldum, Bagon, Dratini and Larvitar |
-| **Trainers** | Minimum party sizes enforced (2 / 3 in gyms / 4–6 for leaders), and no trainer below its route's wild level |
+| **Trainers** | All 818 Hoenn trainers meet the party minimums (2 / 3 in gyms / 4–6 for leaders), rematches included, and none is below its route's wild level |
+| **Trade evolutions** | Solvable solo — the Linking Cord is sold at the Battle Frontier for 1 BP |
 | **Starters** | Kanto starter from Mr. Stone; Johto starter from Steven on Route 118 |
 | **Kanto** | All 417 FRLG maps compiled into the Emerald ROM, reachable postgame by ferry from Lilycove |
 | **Kanto gyms** | All 8 are double battles pairing each Kanto leader with their Johto counterpart, awarding Kanto's own eight badges |
@@ -65,7 +67,7 @@ branched from tag `expansion/1.16.2`:
 
 Every commit hash referenced in these documents resolves there. The full delta from
 upstream is
-[31 commits](https://github.com/rh-hideout/pokeemerald-expansion/compare/expansion/1.16.2...gorepaw:pokeemerald-expansion:emerald-plus),
+[40 commits](https://github.com/rh-hideout/pokeemerald-expansion/compare/expansion/1.16.2...gorepaw:pokeemerald-expansion:emerald-plus),
 or `git diff expansion/1.16.2` in a local checkout.
 
 ## Legal

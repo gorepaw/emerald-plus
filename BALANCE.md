@@ -1,13 +1,11 @@
 # Content and balance rules
 
-Standing rules for encounter tables and trainer parties, plus a record of which
-routes have been signed off. Applied **route by route in story order**, not
-game-wide — "retroactive" means back over the routes already covered, not all
-1,491 trainers in both regions.
+Standing rules for encounter tables and trainer parties, and a record of what
+has been applied. **Hoenn is now complete on both counts.**
 
 ## Tooling
 
-Both live in the engine repo and survive between sessions:
+All four live in the engine repo and survive between sessions:
 
 ```bash
 # what is on a map now - encounters aggregated by species, plus every trainer
@@ -16,11 +14,20 @@ python3 tools/emerald_plus/encounter_report.py Route102:MAP_ROUTE102
 # the twelve land slots individually - needed to choose WHICH slot to overwrite
 python3 tools/emerald_plus/encounter_report.py --raw MAP_ROUTE102
 
-# check every signed-off route against the rules below
-python3 tools/emerald_plus/party_audit.py --done
+# every trainer in Hoenn against the rules below; --list names the misses
+python3 tools/emerald_plus/party_audit.py
+
+# which Gen 1-3 families Hoenn can actually produce
+python3 tools/emerald_plus/availability.py
+
+# one line per table for the whole region, flagging one-species tables
+python3 tools/emerald_plus/table_survey.py land_mons
 ```
 
-`party_audit.py` exits non-zero if anything is short. It reports; it never edits.
+`party_audit.py` and `availability.py` are the regression guards. The audit
+exits non-zero if anything is short; availability should read **373/386** with
+only the 13 legendary and event families outstanding. If either moves, a table
+or a party moved with it.
 
 ---
 
@@ -41,22 +48,26 @@ which slot to overwrite.
 ⚠️ **The Good Rod's rarest slot is 20%.** The only sub-15% slots in the entire
 fishing structure are Super Rod's 4% and 1%. A "1% on the Good Rod" encounter is
 not expressible without editing the global rate constants — which would move
-slot 4's species on all 153 maps that have a fishing table (slot 3 and slot 4
-differ on 145 of them). Not worth it for one species, but that's the lever.
+slot 4's species on all 153 maps that have a fishing table. That's the lever,
+but it's not worth pulling for one species.
 
 ### Rules when editing a table
 
 1. **Totals must stay at 100%.** Every patch script asserts this.
 2. **Newcomers pay for themselves out of the most over-represented species**,
-   never out of a route's signature or its rarity.
+   never out of a route's signature or its rarities.
 3. **Protect the rarities.** Ralts and Seedot (R102), Skitty (R116), Sableye
-   (Granite Cave), Mawile (Victory Road). Patch scripts assert protected slots
-   both before *and* after writing and refuse to save if one moved.
+   (Granite Cave), Larvitar (Jagged Pass), Nuzleaf (R114), Tropius (R119),
+   Kecleon, Absol (R120), Chimecho (Mt. Pyre), Heracross and Pinsir and Pikachu
+   (Safari Zone), Snorunt (Shoal Cave), Plusle (R110). Patch scripts assert
+   protected slots both before *and* after writing and refuse to save if one
+   moved.
 4. **A newcomer inherits the level of the slot it replaced**, so no level curve
    shifts as a side effect.
 5. **Assert the expected current occupant of every slot** before overwriting. A
    misread must fail loudly rather than silently corrupt the table — this caught
-   `route23.inc` having 16 badge references instead of 8.
+   `route23.inc` having 16 badge references instead of 8, and caught Altering
+   Cave owning nine tables under one map name.
 
 ---
 
@@ -73,67 +84,79 @@ differ on 145 of them). Not worth it for one species, but that's the lever.
 **Level floor:** no trainer Pokémon may be below the minimum wild level of the
 map it stands on.
 
+**The two documented exceptions**, both encoded in `party_audit.py`:
+
+- **Wally's Mauville battle** keeps its single Ralts. The scene is that he has
+  just caught it. His later battles carry full parties.
+- **The Winstrate family** is exempt from the level floor. Their battles are
+  scripted from `Route111/scripts.inc` but fought inside a house, and a living
+  room has no grass.
+
 ### Rules when filling parties
 
-1. **Fillers come from the route's own wild table** where it has one, and from
-   the trainer class's theme where it doesn't (Magnemite for a Guitarist,
-   Machop for a Black Belt, Zubat for an Aqua grunt, Aron in a Rock gym).
-2. **Leaders' aces stay last.** Additions go *before* the final Pokémon — the
-   fill scripts have an insert-before-last mode for exactly this.
-3. **Leaders get authored movesets**; rank-and-file get none, so the game
+1. **Fillers come from the map's own wild table** — land *and* water together —
+   preferring a species that also fits the trainer class's theme, and falling
+   back to the class theme alone where the map has no table.
+2. **Only slots worth 5% or more are eligible.** The 4% and 1% slots are where a
+   route keeps its rarities; handing a random Bug Catcher a Larvitar both spikes
+   the fight and cheapens the encounter.
+3. **Leaders' aces stay last.** Additions go *before* the final Pokémon.
+4. **Leaders get authored movesets**; rank-and-file get none, so the game
    assigns level-up moves. Same convention as the Johto trainers.
-4. `IVs:` lines in `.party` are **inert** — `P_ALL_PERFECT_IVS` overrides them at
+5. `IVs:` lines in `.party` are **inert** — `P_ALL_PERFECT_IVS` overrides them at
    the generation choke point. Don't bother tuning them.
+
+⚠️ **A blank line between Pokémon is required by the format.** Appending a mon
+straight after the previous one's `IVs:` line produces a file that a naive
+line-walking parser still reads correctly and `trainerproc` does not. Verify
+party sizes by splitting on blank lines, never with the same walker that wrote
+the file.
 
 ---
 
-## Signed off so far
+## Gen 1–3 availability in Hoenn
 
-| Map | Encounters added | Party work |
+**373 of 386 reachable.** The 13 outstanding are the Gen 1–2 legendaries plus
+the two event mons — Articuno, Zapdos, Moltres, Mewtwo, Mew, Raikou, Entei,
+Suicune, Lugia, Ho-Oh, Celebi, Jirachi, Deoxys — deliberately skipped, since
+none belongs in a normal encounter table. They are their own job.
+
+The unit that matters is the **evolutionary family**, not the species: Gen 3
+lets you walk a family both ways, evolving forward and breeding backward, so one
+member in one wild table makes the whole family obtainable. 55 families had zero
+Hoenn presence and were placed in 82 slots across 57 maps.
+
+Where a table was one species repeated, the newcomers did double duty:
+
+| Map | Was | Now also has |
 |---|---|---|
-| Route 101 | Rattata 5%, Sentret 5% | — |
-| Route 102 | Caterpie 5%, Weedle 5%, Pidgey 1% | Calvin +1 |
-| Route 103 | Spearow 5%, Hoothoot 5%; Poochyena 60→50 | 6 rivals +1 each (Zigzagoon L4 as **lead**), Miguel/Marcos/Rhett/Pete/Isabelle +1 |
-| Route 104 | — | Winston/Cindy/Darian +1 |
-| Petalburg Woods | Metapod 5%, Kakuna 5% | Aqua grunt +1; **Lyle L3 → L5** (level floor) |
-| Rustboro Gym | — | Josh +2, Tommy +1, Marc +1, **Roxanne 3→4** (+Aron 12) |
-| Route 116 | Houndour 5%, Hoothoot 5% | Joey/Jerry/Clark/Janice/Karen +1 |
-| Rusturf Tunnel | Geodude 16%, Meditite 4% (was **100% Whismur**) | Aqua grunt +1 |
-| Route 106 | — | Kyla +1, Ned +1 |
-| Dewford Gym | — | 6 trainers 1→3 each, **Brawly 3→5** |
-| Granite Cave B2F | Onix 9%, **Beldum 1%** | — |
-| Meteor Falls ×4 | **Dratini** Good Rod 20% L15–25, Super Rod 15%; **Dragonair** Super Rod 1% L25–35 | — |
-| Jagged Pass | **Larvitar 1%** L20 | — |
-| Victory Road B1F/B2F | **Pupitar 1%** L42 / L44 | — |
-| Route 107 | *deferred* | Tony +Wailmer, Beth +Wingull, Camron +Goldeen |
-| Route 108 | *deferred* | Jerome +Wailmer, Matthew +Tentacool, Missy +Horsea |
-| Route 109 | *deferred* | Austina +Goldeen, Gwen +Wingull, Edmond +Machop, Ricky +Marill, Hailey +Azurill |
-| Seashore House | — | Johanna +Marill |
+| Mt. Pyre 1F–6F | 100% / 90% Shuppet, six floors | Gastly, and Cubone upstairs — Shuppet still dominant at 70% |
+| Shoal Cave ice room | Spheal + Zubat | Swinub, Sneasel, Jynx, Delibird — an actual ice cave |
+| Magma Hideout ×8 | identical Geodude rooms | Magmar |
+| Safari Zone | — | Tauros, Kangaskhan, Chansey, Scyther, Farfetch'd, Lickitung, Togepi |
+| Route 119 | Zigzagoon + Linoone + Oddish held 90% | Roselia, Venonat, Tangela, Yanma |
+| 32 identical sea maps | Tentacool 60 / Wingull 35 / Pelipper 5 | Krabby, Shellder, Slowpoke, Poliwag, Qwilfish, Mantine, Lapras |
 
-**Next up:** Route 110 → Mauville City, where **Wattson goes 4→6** and the
-six-Pokémon leader rule starts biting.
+**Surskit and Roselia were absent from this build's Emerald tables entirely**
+despite reading as Hoenn natives. They're back, on Routes 102 and 119.
 
-### Deferred, deliberately
+### Trade evolutions
 
-- **The Slateport approach's water and rod tables.** Route 107, Route 108,
-  Route 109 and Slateport City share **one identical table** — Tentacool 60 /
-  Wingull 35 / Pelipper 5 on the surface, and a Super Rod that is five slots of
-  Wailmer. Editing them one route at a time would mean writing the same patch
-  four times, so all the region's water goes in one pass later. Their *parties*
-  are done.
-- **Rematch parties.** Trainers with Match Call rematches (`_2` … `_5`) have
-  never been touched — `RICKY_1` now has two Pokémon while `RICKY_2` still has
-  one Linoone. Every signed-off route has this. One sweep, once the rules stop
-  moving.
+Gengar, Alakazam, Machamp and Golem need a trade and there is no second console.
+The expansion ships `ITEM_LINKING_CORD` as an `EVO_ITEM` alternative on every
+`EVO_TRADE` entry, but nothing sold or gave one — the item existed and was
+unreachable. **It is now stocked by the Battle Frontier's vitamin clerk at 1 BP.**
 
-⚠️ Most of this stretch is **Surf-gated**: only Route 109's beach and the
-Seashore House are reachable when the ferry drops you off, which is why their
-trainers sit at L11–13 while Routes 107, 108 and Route 109's water are L24–27.
-The Abandoned Ship on Route 108 needs Dive and is a much later stop.
+Every other trade evolution was already solvable: Metal Coat, King's Rock,
+Dragon Scale, Up-Grade and the Deep Sea items all have in-game sources, and
+Feebas reaches Milotic through beauty.
+
+Four places must agree when that menu changes — the item list, the description
+list, the vendor's `tNumItems`, and the script's `case` list.
 
 ### Pseudo-legendary availability
 
-Deliberately opened up early. All four lines reachable pre-Elite Four:
+All four lines reachable pre-Elite Four:
 
 | Line | Where | Rate |
 |---|---|---|
@@ -155,8 +178,13 @@ what the better rod buys you is the evolved form, which no other rod can produce
 
 ## Hoenn Pokédex
 
-Now **239 entries**, 25 past vanilla's 214. Every species made catchable in
-Hoenn has been added.
+Now **387 entries**. Every species catchable in Hoenn is in the Hoenn dex — the
+convention since the first Gen 1–2 additions — which as of the availability pass
+means essentially the whole Gen 1–3 list.
+
+The 148 added in that pass include species that were always reachable and never
+listed: Onix, Ditto, the two starter trios given by Mr. Stone and Steven, and the
+entire Gen 2 population of the Safari Zone's expansion areas.
 
 ⚠️ **Two traps here, both of which cost a build:**
 
@@ -165,8 +193,7 @@ Hoenn has been added.
   entries. Grepping the whole file for `F(BUTTERFREE)` hits the Kanto list and
   falsely reports the species as already in the Hoenn dex. Extract the Hoenn
   macro body alone.
-- **`HOENN_DEX_COUNT` must track the LAST entry** of the macro. It was
-  `HOENN_DEX_DEOXYS + 1`; it's now `HOENN_DEX_TYRANITAR + 1`. Appending species
+- **`HOENN_DEX_COUNT` must track the LAST entry** of the macro. Appending species
   without moving it leaves them silently outside the dex.
 
 The real guard is the build: `sHoennToNationalOrder` is sized
@@ -179,4 +206,16 @@ the first line without a trailing backslash" parsing under-reports the list
 badly. Strip comments first.
 
 Dex flags are keyed on **national** number, so all of this is display ordering
-only and never touches the saveblock.
+only and never touches the saveblock. EWRAM held at 226,760 B across the whole
+pass, which confirms it.
+
+---
+
+## Still open
+
+- **The 13 legendary and event families.** Wild tables are the wrong home; they
+  want one-time statics with a flag each, at designed locations.
+- **Kanto.** None of these rules has been applied to the 419 `_Frlg` maps —
+  neither encounters nor parties. `party_audit.py` scopes to Hoenn deliberately.
+- **The Battle Frontier's own facilities.** Battle Pike, Battle Pyramid and
+  Trainer Hill carry their own tables and are untouched.
