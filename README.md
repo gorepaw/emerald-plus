@@ -18,8 +18,11 @@ assets.** See [Legal](#legal) below.
 | **EXP** | Gen 3 rules: split among participants, unscaled, 1.5× from trainers, none for catching, Gen 3–5 held-item Exp. Share |
 | **Kept from Gen 3** | Badge stat boosts, overworld poison damage, no affection mechanics, no Critical Capture |
 | **Movepools** | Gen 1–3 species use authentic RSE learnsets; later species use their debut generation's |
-| **Encounters** | **373 of 386 Gen 1–3 species catchable in Hoenn**, up from 268 — 55 evolutionary families given a home. Only the Gen 1–2 legendaries are missing |
-| **Gen 4–9** | **545 of 639 obtainable**, hosted across Kanto — 284 families placed by type affinity. Only legendaries and paradox mons are missing |
+| **Pokédex** | **Completable. All 576 evolutionary families are obtainable in a single save** — every Pokémon in the game, no trading, no second playthrough |
+| **Encounters** | **373 of 386 Gen 1–3 species catchable in Hoenn**, up from 268 — 55 evolutionary families given a home |
+| **Gen 4–9** | **545 of 639 in the wild**, hosted across Kanto — 284 families placed by type affinity. The rest are legendaries, which are statics |
+| **Legendaries** | 19 rotating spots. Clear one and it refills with a Gen 4–9 legendary the next time Kanto's Champion falls — 103 legendaries in all, at L70, each huntable for nature and shininess |
+| **Starters** | All nine Gen 1–3 starter families are catchable in Kanto, so choosing one per trio costs you nothing |
 | **Kanto scaling** | Postgame content on two bands — wilds L50–89, trainers L60–98 — with species evolved to match |
 | **Kanto league** | All 5 Elite Four and Champion rooms are double battles too: Lorelei+Will, Bruno+Karen, Agatha+Koga, Lance+Chuck, Blue+**Red** |
 | **Rematches** | Every Kanto leader and Elite Four member is in the rematch table and re-fightable, with both halves of a pair scaling together |
@@ -27,7 +30,7 @@ assets.** See [Legal](#legal) below.
 | **Pseudo-legendaries** | All four lines reachable pre-Elite Four — Beldum, Bagon, Dratini and Larvitar |
 | **Trainers** | All 818 Hoenn trainers meet the party minimums (2 / 3 in gyms / 4–6 for leaders), rematches included, and none is below its route's wild level |
 | **Trade evolutions** | Solvable solo — the Linking Cord is sold at the Battle Frontier for 1 BP |
-| **Starters** | Kanto starter from Mr. Stone; Johto starter from Steven on Route 118 |
+| **Starter gifts** | Kanto starter from Mr. Stone; Johto starter from Steven on Route 118 |
 | **Kanto** | All 417 FRLG maps compiled into the Emerald ROM, reachable postgame by ferry from Lilycove |
 | **Kanto gyms** | All 8 are double battles pairing each Kanto leader with their Johto counterpart, awarding Kanto's own eight badges — 3 Pokémon each, at matched levels |
 
@@ -56,6 +59,14 @@ likely to be useful to someone else:
 - **Kanto ships with the expansion.** 140 `*_Frlg` map folders, layouts and encounter
   tables are already in the repo behind the `firered` build target. Getting them into
   an Emerald build is a namespace problem, not a porting problem.
+- **The Sevii Islands were one `setvar` from reachable.** The Seagallop from
+  Vermilion is scripted in full upstream but gated on
+  `VAR_MAP_SCENE_ONE_ISLAND_POKEMON_CENTER_1F`, an FRLG story var nothing in an
+  Emerald build ever advances. Mt. Ember — and Moltres — depended on it.
+- **Kanto's league could only ever be run once.** Nothing here cleared its
+  flags, so beating the Champion set his trainer flag and his room's entry
+  trigger stopped for good: no rematches, and the rematch scripts upstream ships
+  were unreachable. Worth checking in any FRLG-into-Emerald merge.
 - **The namespace merge fits in the saveblock.** Flags, trainer IDs and vars are
   version-split and numerically overlapping; re-basing FRLG trainers and allocating
   the 714 flags upstream stubs to literal `0` costs ~140 of SaveBlock1's 304 free
@@ -71,7 +82,7 @@ branched from tag `expansion/1.16.2`:
 
 Every commit hash referenced in these documents resolves there. The full delta from
 upstream is
-[48 commits](https://github.com/rh-hideout/pokeemerald-expansion/compare/expansion/1.16.2...gorepaw:pokeemerald-expansion:emerald-plus),
+[53 commits](https://github.com/rh-hideout/pokeemerald-expansion/compare/expansion/1.16.2...gorepaw:pokeemerald-expansion:emerald-plus),
 or `git diff expansion/1.16.2` in a local checkout.
 
 ## Legal

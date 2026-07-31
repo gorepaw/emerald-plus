@@ -2,18 +2,28 @@
 
 ## ▶ RESUME HERE
 
-**State as of 2026-07-30:** engine fork at **48 commits** since
-`expansion/1.16.2`. ROM 84.91%, deployed ROM MD5 `5e41b32ba70eede9d51253996ad01871`.
-EWRAM held at 226,760 B throughout, but the rematch enum grew, which moved
-`FLAG_REGISTERED_*` and the meaning of stored `trainerRematches[]` indices —
-**start a new game.**
+**State as of 2026-07-30:** engine fork at **53 commits** since
+`expansion/1.16.2`. ROM 84.89%, built ROM MD5 `f57eb97df42a0a5881c34eeda7cb69ee`.
+EWRAM is **down** to 223,344 B (85.20%) after reclaiming 3,420 bytes of
+link-only save data. **Start a new game** — the rematch enum moved
+`FLAG_REGISTERED_*`, and the save layout was deliberately rebuilt on top.
+
+**The Pokédex is completable: 576 of 576 evolutionary families are obtainable in
+a single save.** That is every Pokémon in the game.
+
+**Save-layout changes were batched on purpose** while a new game was already
+required — see the memory note or the commit. Flag block grown to 256 (227
+free), var range +64, and nine link-only `FREE_*` toggles flipped. Anything that
+moves `FLAGS_COUNT`, `VARS_COUNT`, saveblock field order, or the item/move/
+species enums is save-breaking, so batch it before a real playthrough starts.
+`FREE_MATCH_CALL` and `FREE_EXTRA_SEEN_FLAGS_SAVEBLOCK1` must stay FALSE.
 
 Kanto is walkable postgame with its own eight badge flags, all 8 Kanto gyms are
 Kanto+Johto double battles, doors animate, and the ruleset is settled — read
 **QOL.md** for every config decision and **BALANCE.md** for the encounter and
 trainer-party rules.
 
-## ▶ Both regions are done. The legendaries are what's left.
+## ▶ All content is done. What's left is playing it.
 
 **Hoenn content is complete**, in one autonomous pass on 2026-07-30:
 
@@ -37,16 +47,38 @@ trainer-party rules.
   `TRAINER_JOHTO_KOGA`, because he is both a Kanto gym leader and a Johto
   Elite Four member.
 
-Guard rails: `party_audit.py` at 0/0, `availability.py` at 373/386 and 545/639.
+Guard rails: `party_audit.py` at 0/0, `availability.py` at 373/386 and 545/639,
+and its completability section at **576/576 families in one save**.
+`legendary_audit.py` at 19 slots / 90 placed / 90 unique.
 
-**Track A — the legendaries** *(the deliberate gap)*
+All nine Gen 1–3 starter families are catchable in Kanto as their fully-evolved
+forms, so picking one per trio no longer costs you the other six.
 
-13 Gen 1–2 families and 90 Gen 4–9 legendary/paradox families.
+**Track A — DONE. The legendaries are 19 rotating slots.**
 
-Articuno, Zapdos, Moltres, Mewtwo, Mew, Raikou, Entei, Suicune, Lugia, Ho-Oh,
-Celebi, Jirachi, Deoxys. Skipped on purpose — none belongs in a normal encounter
-table. They want one-time static encounters: a designed location each, its own
-flag so it can't repeat, and encounter music. Roughly 13 new map scripts.
+Clear a spot — catch or defeat — and it stays empty until Kanto's Champion next
+falls, then refills with the next Gen 4–9 legendary. Slots advance
+**independently**: nothing waits on any other legendary, so refills come free
+with the E4 money runs you were doing anyway. All 103 legendaries at **L70**.
+5 Champion wins is the fewest to see all 90 successors, not a gate.
+
+Species are a **fixed authored table, never a random draw** — that is what makes
+them huntable. `CreateScriptedWildMon` rerolls personality and IVs every call,
+so nature and shininess reset on re-entry while the species stays put.
+
+Only five needed new homes: Raikou → New Mauville, Entei → Fiery Path, Suicune →
+Shoal Cave, Celebi → Viridian Forest, Jirachi → Meteor Falls. Four already had
+Kanto statics; four more sat on the event islands, which the Champion's ticket
+rotation (Mystic → Aurora → Old Sea Map → Eon) now opens.
+
+Built additively — no existing legendary script was rewritten. Each slot got a
+*second* object on the same tile, with the original's resolved-flag as its
+prerequisite. Guard rail: `legendary_audit.py` → 19 slots, 90 placed, 90 unique.
+
+**Two blockers found and fixed along the way:** the Sevii Islands were
+unreachable (one FRLG story var), and **Kanto's league could only be run once** —
+nothing cleared its flags, so the Champion's room stopped triggering forever,
+killing E4 money rematches and the Blue+Red rematch pairing alike.
 
 **Track B — DONE.** All 8 gyms and all 5 league rooms are double battles. The
 rematch table holds 90 of 100 entries with Kanto's leaders correctly placed
