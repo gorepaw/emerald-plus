@@ -22,6 +22,7 @@ assets.** See [Legal](#legal) below.
 | **Gen 4–9** | **545 of 639 obtainable**, hosted across Kanto — 284 families placed by type affinity. Only legendaries and paradox mons are missing |
 | **Kanto scaling** | Postgame content on two bands — wilds L50–89, trainers L60–98 — with species evolved to match |
 | **Kanto league** | All 5 Elite Four and Champion rooms are double battles too: Lorelei+Will, Bruno+Karen, Agatha+Koga, Lance+Chuck, Blue+**Red** |
+| **Rematches** | Every Kanto leader and Elite Four member is in the rematch table and re-fightable, with both halves of a pair scaling together |
 | **Pokédex** | Hoenn dex extended to 387 entries; every species catchable in Hoenn is listed in it |
 | **Pseudo-legendaries** | All four lines reachable pre-Elite Four — Beldum, Bagon, Dratini and Larvitar |
 | **Trainers** | All 818 Hoenn trainers meet the party minimums (2 / 3 in gyms / 4–6 for leaders), rematches included, and none is below its route's wild level |
@@ -70,7 +71,7 @@ branched from tag `expansion/1.16.2`:
 
 Every commit hash referenced in these documents resolves there. The full delta from
 upstream is
-[46 commits](https://github.com/rh-hideout/pokeemerald-expansion/compare/expansion/1.16.2...gorepaw:pokeemerald-expansion:emerald-plus),
+[47 commits](https://github.com/rh-hideout/pokeemerald-expansion/compare/expansion/1.16.2...gorepaw:pokeemerald-expansion:emerald-plus),
 or `git diff expansion/1.16.2` in a local checkout.
 
 ## Legal

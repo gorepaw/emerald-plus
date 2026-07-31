@@ -330,9 +330,8 @@ before Kanto is reachable, so no dex work was needed.
   flag each, at designed locations.
 - **The Battle Frontier's own facilities.** Battle Pike, Battle Pyramid and
   Trainer Hill carry their own tables and are untouched.
-- **Kanto gym rematches aren't re-fightable yet.** The table entries exist and
-  are correctly classified, and the Elite Four rematches work because their
-  rooms already have a rematch path. The eight gyms don't — see below.
+- **Nothing in the rematch system.** Table entries, Johto partner scaling, gym
+  rematch branches and the Match Call rotation are all done — see below.
 
 ---
 
@@ -357,21 +356,38 @@ Four have a `_2` party each, so their entry escalates once and then holds.
 Adding entries shifts every `REMATCH_*` value after `REMATCH_JUAN`, which moves
 `FLAG_REGISTERED_*` and the meaning of saved `trainerRematches[]` indices.
 
-### What is *not* wired
+### How the gym rematch is wired
 
-The eight Kanto gyms have no rematch branch in their scripts, so a leader can be
-offered but not re-fought. Two things block a copy of the Hoenn pattern:
+Each leader's post-battle script opens with:
 
-- `ShouldTryRematchBattle` reads `TRAINER_BATTLE_PARAM.opponentA`. Hoenn's gyms
-  set it because `trainerbattle_single` runs even when the leader is already
-  beaten; Kanto's guard with `goto_if_set FLAG_DEFEATED_*` **before** the battle
-  command, so the parameter is never populated on that path.
-- There is no two-trainer equivalent of `trainerbattle_rematch_double`, so a
-  plain `trainerbattle_two_trainers` in a rematch branch would never advance
-  `trainerRematches[]` and the leader would stay permanently rematchable.
+```
+	setvar VAR_0x8004, TRAINER_LEADER_X
+	specialvar VAR_RESULT, ShouldTryRematchBattleForVar
+	goto_if_eq VAR_RESULT, TRUE, <Gym>_EventScript_XRematch
+```
 
-Doing it properly means restructuring eight working gym scripts to the Hoenn
-shape and adding a script-visible special that takes a trainer id from a var.
-Until then Kanto's leaders are deliberately left out of
-`GymLeaderRematches_AfterNewMauville`, so nothing offers a fight that cannot
-happen.
+and the rematch script re-runs the same double battle. Three engine facts make
+that work, and each is worth knowing before touching this again:
+
+- **`trainerbattle_two_trainers` has no already-fought gate.** It maps to
+  `TRAINER_BATTLE_TWO_TRAINERS_NO_INTRO`, which returns
+  `EventScript_DoNoIntroTrainerBattle` unconditionally — so a rematch genuinely
+  starts. That's also *why* the first fight must be guarded by `FLAG_DEFEATED_*`.
+- **Winning clears the want-rematch state by itself.**
+  `HandleRematchVarsOnBattleEnd` runs on every won trainer battle and calls
+  `ClearTrainerWantRematchState` for `opponentA`. No bespoke bookkeeping, no
+  counter to desync.
+- **The stock `ShouldTryRematchBattle` doesn't work here.** It reads
+  `TRAINER_BATTLE_PARAM.opponentA`, which is only set once a trainerbattle
+  command has run. Hoenn's gyms get that for free because `trainerbattle_single`
+  executes even when the leader is already beaten; Kanto's branch on
+  `FLAG_DEFEATED_*` first and never reach it. Hence `ShouldTryRematchBattleForVar`
+  — six lines, no new state.
+
+With the fight reachable, the eight leaders are in
+`GymLeaderRematches_AfterNewMauville` so Match Call offers them. **That array
+only** — Kanto is unreachable until the Hoenn league is cleared, so a Kanto
+leader can never want a rematch before that point.
+
+A leader rematch is the same fight again, because leaders repeat one trainer id
+across all five table slots. The Elite Four escalate once, to their `_2` party.
