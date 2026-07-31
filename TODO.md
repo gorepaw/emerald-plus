@@ -2,7 +2,7 @@
 
 ## ▶ RESUME HERE
 
-**State as of 2026-07-30:** engine fork at **47 commits** since
+**State as of 2026-07-30:** engine fork at **48 commits** since
 `expansion/1.16.2`. ROM 84.91%, deployed ROM MD5 `5e41b32ba70eede9d51253996ad01871`.
 EWRAM held at 226,760 B throughout, but the rematch enum grew, which moved
 `FLAG_REGISTERED_*` and the meaning of stored `trainerRematches[]` indices —

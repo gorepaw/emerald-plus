@@ -20,6 +20,10 @@ python3 tools/emerald_plus/party_audit.py
 # Gen 1-3 in Hoenn, and Gen 4-9 across both regions
 python3 tools/emerald_plus/availability.py
 
+# move a level band; settles species up AND down. --dry writes nothing, so an
+# identity remap is a free consistency check on the data you already have
+python3 tools/emerald_plus/rescale.py --wilds Kanto 50 89 50 89 --dry
+
 # one line per table for the whole region, flagging one-species tables
 python3 tools/emerald_plus/table_survey.py land_mons
 ```
